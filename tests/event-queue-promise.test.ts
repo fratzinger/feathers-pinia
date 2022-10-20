@@ -1,20 +1,15 @@
-import {
-  useQueuePromise,
-  makeGetterName,
-  makeState,
-  resetState,
-} from '../src/service-store/event-queue-promise'
-import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { useQueuePromise, makeGetterName, makeState, resetState } from '../src/service/event-queue-promise'
+import { createPinia, defineStore } from 'pinia'
 import { api } from './feathers'
 import { timeout } from './test-utils'
+import { BaseModel, useService } from '../src'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
 class Message extends BaseModel {}
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messagesService = useMessagesService(pinia)
 
 describe('Event Queue Promises', () => {

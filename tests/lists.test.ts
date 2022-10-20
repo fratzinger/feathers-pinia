@@ -1,14 +1,14 @@
-import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { createPinia, defineStore } from 'pinia'
+import { BaseModel, useService } from '../src'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
 class Message extends BaseModel {}
-const useMessagesService = defineStore({ servicePath: 'messages', idField: 'id', Model: Message })
+const useMessagesService = defineStore('messages', () =>
+  useService({ servicePath: 'messages', idField: 'id', Model: Message, app: api }),
+)
 const messagesService = useMessagesService(pinia)
 
 const reset = () => resetStores(api.service('messages'), messagesService)
@@ -29,19 +29,19 @@ describe('Lists', () => {
   })
 
   test('itemIds getter returns item ids in itemsById', async () => {
-    messagesService.addToStore({ id: "507f1f77bcf86cd799439011", text: 'hydrate me' })
-    expect(messagesService.itemIds).toStrictEqual([0, 1, 2, 3, 4, 5, 6, "507f1f77bcf86cd799439011"])
-  });
+    messagesService.addToStore({ id: '507f1f77bcf86cd799439011', text: 'hydrate me' })
+    expect(messagesService.itemIds).toStrictEqual([0, 1, 2, 3, 4, 5, 6, '507f1f77bcf86cd799439011'])
+  })
 
   test('temps getter returns items in tempsById', async () => {
     expect(messagesService.temps.length).toBe(7)
   })
 
   test('tempIds getter returns temp ids in tempsById', async () => {
-    const {tempIdField} = messagesService
-    const tempIds = messagesService.temps.map((temp: any) => temp[tempIdField]);
+    const { tempIdField } = messagesService
+    const tempIds = messagesService.temps.map((temp: any) => temp[tempIdField])
     expect(messagesService.tempIds).toStrictEqual(tempIds)
-  });
+  })
 
   test('clones getter returns clones in clonesById', async () => {
     messagesService.items.forEach((item: any) => item.clone())
@@ -51,5 +51,5 @@ describe('Lists', () => {
   test('cloneIds getter returns clone ids in clonesById', async () => {
     messagesService.items.forEach((item: any) => item.clone())
     expect(messagesService.cloneIds).toStrictEqual([0, 1, 2, 3, 4, 5, 6])
-  });
+  })
 })

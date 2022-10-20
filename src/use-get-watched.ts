@@ -1,17 +1,16 @@
-import type { UseGetComputed, UseGetOptionsStandalone, UseGetState } from './service-store/types'
+import type { ModelStatic, UseGetComputed, UseGetOptionsStandalone, UseGetState } from './service/types'
 import type { Id } from '@feathersjs/feathers'
 import type { Params } from './types'
 import { reactive, computed, toRefs, unref, watch } from 'vue-demi'
-import { BaseModel } from './service-store'
 
-export function useGetWatched<M extends BaseModel = BaseModel>({
+export function useGetWatched<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>>({
   model,
   id,
   params = computed(() => ({})),
   queryWhen = computed((): boolean => true),
   local = false,
   immediate = true,
-}: UseGetOptionsStandalone<M>) {
+}: UseGetOptionsStandalone<C>) {
   if (!model) {
     throw new Error(`No model provided for useGetWatched(). Did you define and register it with FeathersPinia?`)
   }
@@ -32,7 +31,7 @@ export function useGetWatched<M extends BaseModel = BaseModel>({
     request: null,
   })
 
-  const computes: UseGetComputed<M> = {
+  const computes: UseGetComputed<C, M> = {
     item: computed(() => {
       const unrefId = getId()
       if (unrefId === null) {

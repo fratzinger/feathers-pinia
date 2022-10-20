@@ -1,21 +1,19 @@
 import { computed, ref, reactive } from 'vue-demi'
-import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { createPinia, defineStore } from 'pinia'
 import { api } from './feathers'
 import { timeout } from './test-utils'
 import { useFindWatched } from '../src/use-find-watched'
 import { usePagination } from '../src/use-pagination'
+import { BaseModel, useService } from '../src'
 
 const pinia = createPinia()
-
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
 
 class Message extends BaseModel {
   static modelName = 'Message'
 }
 
 const servicePath = 'messages'
-const useMessagesService = defineStore({ servicePath, Model: Message })
+const useMessagesService = defineStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
 
 const messagesService = useMessagesService(pinia)
 

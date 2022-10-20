@@ -1,14 +1,7 @@
 import type { Paginated, Params, QueryInfo } from './types'
-import type {
-  ServiceStoreDefault,
-  FindFn,
-  FindClassParamsStandalone,
-  FindClassParams,
-  CurrentQuery,
-} from './service-store/types'
+import type { FindFn, FindClassParamsStandalone, FindClassParams, CurrentQuery, ModelStatic } from './service/types'
 import type { MaybeRef } from './utility-types'
 import { computed, ComputedRef, isReadonly, isRef, Ref, ref, unref, watch, WritableComputedRef } from 'vue-demi'
-import { BaseModel } from './service-store/base-model'
 import { usePageData } from './utils-pagination'
 import {
   computedAttr,
@@ -21,13 +14,13 @@ import {
 import { _ } from '@feathersjs/commons'
 import isEqual from 'fast-deep-equal'
 
-type Store<M extends BaseModel> = ServiceStoreDefault<M>
-
-export function useFind<M extends BaseModel>(params: MaybeRef<FindClassParamsStandalone<M>>) {
-  return new Find(params)
+export function useFind<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>>(
+  params: MaybeRef<FindClassParamsStandalone<C, M>>,
+) {
+  return new Find<C, M>(params)
 }
 
-export class Find<M extends BaseModel> {
+export class Find<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>> {
   params: Ref<FindClassParams>
   onServer: boolean
   isSsr: ComputedRef<boolean>
@@ -70,14 +63,14 @@ export class Find<M extends BaseModel> {
   toEnd: () => Promise<void>
   toPage: (page: number) => Promise<void>
 
-  constructor(_params: MaybeRef<FindClassParamsStandalone<M>>) {
+  constructor(_params: MaybeRef<FindClassParamsStandalone<C>>) {
     // If the _params are a computed, store them so we can watch them later.
     let _computedParams: any
     if (isReadonly(_params)) {
       _computedParams = _params
     }
 
-    const store = unref(_params).store as Store<M>
+    const store = unref(_params).store as any as Store<C>
     // If we started without a query, assign an empty query. Assure computed params becomes writable ref.
     const params = isRef(_params) ? (isReadonly(_params) ? ref(_params.value) : _params) : ref(_params)
 

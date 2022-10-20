@@ -1,26 +1,23 @@
-import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { createPinia, defineStore } from 'pinia'
+import { useService } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
 describe('whitelist', () => {
   test('adds whitelist to the state', async () => {
-    const { defineStore } = setupFeathersPinia({
-      clients: { api },
-      whitelist: ['$regex'],
-    })
-
-    const useMessagesService = defineStore({ servicePath: 'messages' })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', whitelist: ['$regex'], app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     expect(messagesService.whitelist[0]).toBe('$regex')
   })
 
   test('find getter fails without whitelist', async () => {
-    const { defineStore } = setupFeathersPinia({ clients: { api } })
-
-    const useLettersService = defineStore({ servicePath: 'letters' })
+    const useLettersService = defineStore('letters', () =>
+      useService({ servicePath: 'letters', whitelist: ['$regex'], app: api }),
+    )
     const lettersService = useLettersService(pinia)
 
     const fn = () => lettersService.findInStore({ query: { $regex: 'test' } })
@@ -29,12 +26,9 @@ describe('whitelist', () => {
   })
 
   test('enables custom query params for the find getter', async () => {
-    const { defineStore } = setupFeathersPinia({
-      clients: { api },
-      whitelist: ['$regex'],
-    })
-
-    const useMessagesService = defineStore({ servicePath: 'messages' })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', whitelist: ['$regex'], app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     await messagesService.create({ text: 'test' })
@@ -51,13 +45,9 @@ describe('whitelist', () => {
   })
 
   test('retrieves custom query params ($options) from the service options', async () => {
-    // The $options param is defined on the service in feathers.ts
-    const { defineStore } = setupFeathersPinia({
-      clients: { api },
-      whitelist: ['$regex'],
-    })
-
-    const useMessagesService = defineStore({ servicePath: 'messages' })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', whitelist: ['$regex'], app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     await messagesService.create({ text: 'test' })

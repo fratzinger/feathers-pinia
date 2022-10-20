@@ -1,5 +1,5 @@
-import { BaseModel } from './service-store'
-import { ModelStatic } from './service-store/types'
+import { BaseModel } from './service'
+import { ModelStatic } from './service/types'
 
 export const models: Record<string, any> = {}
 

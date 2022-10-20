@@ -1,37 +1,44 @@
-import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/setup'
+import { createPinia, defineStore } from 'pinia'
+import { BaseModel, useService } from '../src'
 import { api } from './feathers'
+import { ref, computed } from 'vue-demi'
 
 const pinia = createPinia()
 
-export const { defineStore, BaseModel } = setupFeathersPinia({
-  ssr: true,
-  clients: { api },
-  idField: 'id',
-  whitelist: ['$regex', '$options'],
-})
-
 class User extends BaseModel {}
 
-const storeOptions = {
-  Model: User,
-  state: () => ({
-    firstName: 'Bob',
-    lastName: 'Smith',
-    age: 20,
-  }),
-  getters: {
-    fullName: (state: any): string => `${state.firstName} ${state.lastName}`,
-  },
-  actions: {
-    greet(): string {
-      return 'Hello from action'
-    },
-  },
+const makeStore = ({ servicePath }) => {
+  const store = useService({
+    servicePath,
+    Model: User,
+    app: api,
+    ssr: true,
+    idField: 'id',
+    whitelist: ['$regex', '$options'],
+  })
+
+  const firstName = ref('Bob')
+  const lastName = ref('Smith')
+  const age = ref(20)
+
+  const fullName = computed(() => `${firstName.value} ${lastName.value}`)
+
+  function greet() {
+    return 'Hello from action'
+  }
+
+  return {
+    ...store,
+    firstName,
+    lastName,
+    age,
+    fullName,
+    greet,
+  }
 }
 
-describe('Define User Store 1 (from options without options.id)', () => {
-  const useUsersStore = defineStore({ servicePath: 'users', ...storeOptions })
+describe('Define User Store', () => {
+  const useUsersStore = defineStore('users', () => makeStore({ servicePath: 'users' }))
   const store = useUsersStore(pinia)
 
   test('can interact with store', async () => {
@@ -39,61 +46,6 @@ describe('Define User Store 1 (from options without options.id)', () => {
     expect(store.idField).toBe('id')
     expect(store.tempIdField).toBe('__tempId')
     expect(store.$id).toBe('service.users')
-    expect(store.servicePath).toBe('users')
-    expect(store.firstName).toBe('Bob')
-    expect(store.fullName).toBe('Bob Smith')
-    expect(store.greet()).toBe('Hello from action')
-    store.firstName = 'John'
-    expect(store.firstName).toBe('John')
-    expect(store.fullName).toBe('John Smith')
-    expect(store.greet()).toBe('Hello from action')
-  })
-})
-
-describe('Define User Store 2 (from options with options.id)', () => {
-  const useUsersStore = defineStore({ id: 'users2', servicePath: 'users', ...storeOptions })
-  const store = useUsersStore(pinia)
-
-  test('can interact with store', async () => {
-    expect(store.$id).toBe('users2')
-    expect(store.servicePath).toBe('users')
-    expect(store.firstName).toBe('Bob')
-    expect(store.fullName).toBe('Bob Smith')
-    expect(store.greet()).toBe('Hello from action')
-    store.firstName = 'John'
-    expect(store.firstName).toBe('John')
-    expect(store.fullName).toBe('John Smith')
-    expect(store.greet()).toBe('Hello from action')
-  })
-})
-
-describe('Define User Store 3 (from id and options without options.id)', () => {
-  const useUsersStore = defineStore('users3', { servicePath: 'users', ...storeOptions })
-  const store = useUsersStore(pinia)
-
-  test('can interact with store', async () => {
-    expect(store.$id).toBe('users3')
-    expect(store.servicePath).toBe('users')
-    expect(store.firstName).toBe('Bob')
-    expect(store.fullName).toBe('Bob Smith')
-    expect(store.greet()).toBe('Hello from action')
-    store.firstName = 'John'
-    expect(store.firstName).toBe('John')
-    expect(store.fullName).toBe('John Smith')
-    expect(store.greet()).toBe('Hello from action')
-  })
-})
-
-describe('Define User Store 4 (from id and options with options.id)', () => {
-  const useUsersStore = defineStore('users4', {
-    id: 'should-be-overriden',
-    servicePath: 'users',
-    ...storeOptions,
-  })
-  const store = useUsersStore(pinia)
-
-  test('can interact with store', async () => {
-    expect(store.$id).toBe('users4')
     expect(store.servicePath).toBe('users')
     expect(store.firstName).toBe('Bob')
     expect(store.fullName).toBe('Bob Smith')

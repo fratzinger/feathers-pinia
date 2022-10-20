@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { setupFeathersPinia, BaseModel } from '../src/index' // from 'feathers-pinia'
-import { createPinia } from 'pinia'
+import { BaseModel, useService } from '../src/index' // from 'feathers-pinia'
+import { createPinia, defineStore } from 'pinia'
 import { api } from './feathers'
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
 describe('Tracking Constructor Run Counts', () => {
   const resetStore = () => {
@@ -24,7 +23,9 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', Model: Message, app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     // Test
@@ -44,7 +45,9 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', Model: Message, app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     // Test
@@ -64,7 +67,9 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', Model: Message, app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     // Test
@@ -84,7 +89,9 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', Model: Message, app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     // Test
@@ -104,7 +111,9 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+    const useMessagesService = defineStore('messages', () =>
+      useService({ servicePath: 'messages', Model: Message, app: api }),
+    )
     const messagesService = useMessagesService(pinia)
 
     // Test

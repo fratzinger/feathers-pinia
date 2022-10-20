@@ -1,12 +1,13 @@
 import type { Params, Paginated, QueryInfo, DiffDefinition } from './types'
 import type { MaybeRef } from './utility-types'
-import type { AnyData, AnyDataOrArray, BaseModelAssociations, FindClassParams } from './service-store/types'
+import type { AnyData, AnyDataOrArray, BaseModelAssociations, FindClassParams } from './service/types'
 import { _ } from '@feathersjs/commons'
 import stringify from 'fast-json-stable-stringify'
 import ObjectID from 'isomorphic-mongo-objectid'
 import fastCopy from 'fast-copy'
 import { computed, Ref, unref } from 'vue-demi'
 import isEqual from 'fast-deep-equal'
+import { Id } from '@feathersjs/feathers'
 
 function stringifyIfObject(val: any): string | any {
   if (typeof val === 'object' && val != null) {
@@ -23,10 +24,10 @@ function stringifyIfObject(val: any): string | any {
  * @param item
  * @param idField
  */
-export function getId(item: any, idField: string) {
+export function getId(item: any, idField: string): Id | undefined {
   if (!item) return
   if (idField && item[idField] != undefined) {
-    return stringifyIfObject(item[idField as string])
+    return stringifyIfObject(item[idField])
   }
   if (item.id != undefined) {
     return stringifyIfObject(item.id)
@@ -152,7 +153,7 @@ export function getArray<T>(data: T | T[]) {
   return { items: isArray ? data : [data], isArray }
 }
 
-export const hasOwn = (obj: AnyData, prop: string) => Object.prototype.hasOwnProperty.call(obj, prop)
+export const hasOwn = (obj: AnyData, prop: PropertyKey) => Object.prototype.hasOwnProperty.call(obj, prop)
 
 export function getSaveParams(params?: MaybeRef<Params>): Params {
   if (!params) {

@@ -1,15 +1,12 @@
 import { computed, ref } from 'vue-demi'
-import { createPinia } from 'pinia'
-import { setupFeathersPinia, useFindWatched } from '../src/index'
+import { createPinia, defineStore } from 'pinia'
+import { useFindWatched, QueryWhenContext, QueryWhenFunction, BaseModel, useService } from '../src'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
-import { QueryWhenContext, QueryWhenFunction } from '../src/service-store/types'
 import { vi } from 'vitest'
 
 function createTestContext() {
   const pinia = createPinia()
-
-  const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
 
   class Message extends BaseModel {
     static modelName = 'Message'
@@ -17,7 +14,7 @@ function createTestContext() {
   }
 
   const servicePath = 'messages'
-  const useMessagesService = defineStore({ servicePath, Model: Message })
+  const useMessagesService = defineStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
 
   const messagesService = useMessagesService(pinia)
 

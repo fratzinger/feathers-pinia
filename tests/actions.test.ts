@@ -1,11 +1,9 @@
-import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { createPinia, defineStore } from 'pinia'
+import { BaseModel, useService } from '../src/index'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 
 const pinia = createPinia()
-
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
 
 class Message extends BaseModel {
   id?: number
@@ -14,7 +12,13 @@ class Message extends BaseModel {
   otherText?: string
 }
 const servicePath = 'messages'
-const useMessages = defineStore({ servicePath, Model: Message })
+const useMessages = defineStore(servicePath, () =>
+  useService({
+    Model: Message,
+    app: api,
+    servicePath,
+  }),
+)
 
 const messagesStore = useMessages(pinia)
 

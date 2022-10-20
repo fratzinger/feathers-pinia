@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { setupFeathersPinia, models, BaseModel, type ModelStatic, type BaseModelModifierOptions } from '../src/index' // from 'feathers-pinia'
-import { createPinia } from 'pinia'
+import { BaseModel, useService, type BaseModelModifierOptions } from '../src/index' // from 'feathers-pinia'
+import { createPinia, defineStore } from 'pinia'
 import { api } from './feathers'
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
 export class Message extends BaseModel {
   text1 = 'Class Defaults'
@@ -22,7 +21,9 @@ export class Message extends BaseModel {
   }
 }
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messagesService = useMessagesService(pinia)
 
 const resetStore = () => {

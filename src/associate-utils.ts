@@ -5,8 +5,8 @@ import type {
   FindClassParamsStandalone,
   ModelStatic,
   ServiceStoreDefault,
-} from './service-store/types'
-import { BaseModel } from './service-store'
+} from './service/types'
+import { BaseModel } from './service'
 
 export type HandleSetInstance<M> = (this: M, associatedRecord: M) => void
 
@@ -27,11 +27,11 @@ function defaultHandleSetInstance<M>(associatedRecord: M) {
   return associatedRecord
 }
 
-export function setupAssociation<M extends BaseModel>(
+export function setupAssociation<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>>(
   instance: M,
   handleSetInstance: any,
   prop: string,
-  Model: ModelStatic<BaseModel>,
+  Model: C,
   propUtilsPrefix: string,
 ) {
   // Define the association
@@ -39,9 +39,9 @@ export function setupAssociation<M extends BaseModel>(
 
   const _handleSetInstance = handleSetInstance || defaultHandleSetInstance
 
-  // Register the association on the instance.Model
-  if (!instance.Model.associations[prop]) {
-    (instance.Model.associations as BaseModelAssociations)[prop] = def
+  // Register the association on the instance.getModel()
+  if (!instance.getModel().associations[prop]) {
+    (instance.getModel().associations as BaseModelAssociations)[prop] = def
   }
 
   // prefix the prop name with the `propUtilsPrefix`, which is `_`, by default.

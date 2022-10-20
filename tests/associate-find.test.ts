@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Params } from '@feathersjs/feathers/lib'
 import type { ComputedRef, Ref } from 'vue-demi'
-import { setupFeathersPinia, BaseModel, associateFind, AssociateFindUtils } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, associateFind, AssociateFindUtils, useService, defineStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
@@ -61,12 +61,13 @@ export class Message extends BaseModel {
 }
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
-const useUsersService = defineStore({ servicePath: 'users', Model: User })
+const useUsersService = defineStore('users', () => useService({ servicePath: 'users', Model: User, app: api }))
 const userStore = useUsersService(pinia)
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messageStore = useMessagesService(pinia)
 
 const reset = () => {

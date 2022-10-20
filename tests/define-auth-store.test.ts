@@ -1,12 +1,12 @@
-import { createPinia } from 'pinia'
-import { defineAuthStore } from '../src/index'
+import { createPinia, defineStore } from 'pinia'
+import { useAuth } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
 describe('Define Auth Store 1 (from options without options.id)', () => {
-  const useAuth = defineAuthStore({ feathersClient: api })
-  const store = useAuth(pinia)
+  const useAuthStore = defineStore('auth', () => useAuth({ app: api }))
+  const store = useAuthStore(pinia)
   test('can authenticate', async () => {
     const response = await store.authenticate({ strategy: 'jwt', accessToken: 'hi' })
     expect(store.$id).toBe('auth')
@@ -26,8 +26,8 @@ describe('Define Auth Store 1 (from options without options.id)', () => {
 })
 
 describe('Define Auth Store 2 (from options with options.id)', () => {
-  const useAuth = defineAuthStore({ id: 'auth2', feathersClient: api })
-  const store = useAuth(pinia)
+  const useAuthStore = defineStore('auth2', () => useAuth({ app: api }))
+  const store = useAuthStore(pinia)
   test('can authenticate', async () => {
     const response = await store.authenticate({ strategy: 'jwt', accessToken: 'hi' })
     expect(store.$id).toBe('auth2')
@@ -47,8 +47,8 @@ describe('Define Auth Store 2 (from options with options.id)', () => {
 })
 
 describe('Define Auth Store 3 (from id and options without options.id)', () => {
-  const useAuth = defineAuthStore('auth3', { feathersClient: api })
-  const store = useAuth(pinia)
+  const useAuthStore = defineStore('auth3', () => useAuth({ app: api }))
+  const store = useAuthStore(pinia)
   test('can authenticate', async () => {
     const response = await store.authenticate({ strategy: 'jwt', accessToken: 'hi' })
     expect(store.$id).toBe('auth3')
@@ -68,8 +68,8 @@ describe('Define Auth Store 3 (from id and options without options.id)', () => {
 })
 
 describe('Define Auth Store 4 (from id and options with options.id)', () => {
-  const useAuth = defineAuthStore('auth4', { feathersClient: api })
-  const store = useAuth(pinia)
+  const useAuthStore = defineStore('auth4', () => useAuth({ app: api }))
+  const store = useAuthStore(pinia)
   test('can authenticate', async () => {
     const response = await store.authenticate({ strategy: 'jwt', accessToken: 'hi' })
     expect(store.$id).toBe('auth4')

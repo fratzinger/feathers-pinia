@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Ref } from 'vue-demi'
 import type { Id } from '@feathersjs/feathers/lib'
-import { setupFeathersPinia, BaseModel, associateGet, type Params } from '../src/index' // from 'feathers-pinia'
-import { createPinia } from 'pinia'
+import { BaseModel, associateGet, type Params, useService } from '../src/index' // from 'feathers-pinia'
+import { createPinia, defineStore } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 
@@ -56,12 +56,11 @@ export class Message extends BaseModel {
 }
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
-const useUsersService = defineStore({ servicePath: 'users', Model: User })
+const useUsersService = defineStore('users', () => useService({ servicePath: 'users', Model: User, app: api }))
 const userStore = useUsersService(pinia)
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineStore('messages', () => ({ servicePath: 'messages', Model: Message, app: api }))
 const messageStore = useMessagesService(pinia)
 
 const reset = () => {
