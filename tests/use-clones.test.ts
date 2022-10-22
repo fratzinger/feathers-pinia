@@ -1,5 +1,5 @@
-import { createPinia, defineStore } from 'pinia'
-import { BaseModel, useClones, useService } from '../src/index'
+import { createPinia } from 'pinia'
+import { BaseModel, useClones, useService, defineStore } from '../src/index'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { reactive } from 'vue-demi'

@@ -1,5 +1,5 @@
-import { createPinia, defineStore } from 'pinia'
-import { useService } from '../src'
+import { createPinia } from 'pinia'
+import { useService, defineStore } from '../src'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 

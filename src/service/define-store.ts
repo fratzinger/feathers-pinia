@@ -1,14 +1,17 @@
-import { defineStore as _defineStore } from 'pinia'
-import { GenericStore } from './store-types'
+import { defineStore as _defineStore, Pinia } from 'pinia'
 
 export const defineStore = <Id extends string, SS>(id: Id, setupStore: () => SS) => {
-  const store = _defineStore(id, setupStore)
+  const storeDefinition = _defineStore(id, setupStore)
 
-  const model = (store as any as GenericStore).Model
+  return (pinia?: Pinia) => {
+    const store = storeDefinition(pinia)
 
-  Object.assign(model, {
-    store,
-  })
+    // @ts-expect-error - we're adding a property to the store
+    const model = store.Model
 
-  return store
+    Object.assign(model, {
+      store,
+    })
+    return store
+  }
 }

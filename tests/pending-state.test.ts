@@ -1,8 +1,8 @@
 import { watch, computed } from 'vue-demi'
-import { createPinia, defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
-import { BaseModel, RequestTypeById, useService } from '../src'
+import { BaseModel, RequestTypeById, useService, defineStore } from '../src'
 import { vi } from 'vitest'
 
 const pinia = createPinia()
@@ -29,7 +29,7 @@ describe('Pending State', () => {
     test('pending state for find success', async () => {
       // setup the watcher with a mock function
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.find, handler)
+      watch(() => messagesService.isFindPending, handler)
 
       // Trigger the watcher with a request.
       await messagesService.find({ query: {} })
@@ -42,7 +42,7 @@ describe('Pending State', () => {
 
     test('pending state for find error', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.find, handler)
+      watch(() => messagesService.isFindPending, handler)
 
       try {
         // Feathers will throw because of $custom
@@ -56,7 +56,7 @@ describe('Pending State', () => {
     test('pending state for count success', async () => {
       // setup the watcher with a mock function
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.count, handler)
+      watch(() => messagesService.isCountPending, handler)
 
       // Trigger the watcher with a request.
       await messagesService.count({ query: {} })
@@ -69,7 +69,7 @@ describe('Pending State', () => {
 
     test('pending state for count error', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.count, handler)
+      watch(() => messagesService.isCountPending, handler)
 
       try {
         // Feathers will throw because of $custom
@@ -82,7 +82,7 @@ describe('Pending State', () => {
 
     test('pending state for get success', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.get, handler)
+      watch(() => messagesService.isGetPending, handler)
 
       await messagesService.get(0)
 
@@ -92,7 +92,7 @@ describe('Pending State', () => {
 
     test('pending state for get error', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.get, handler)
+      watch(() => messagesService.isGetPending, handler)
 
       try {
         // Feathers will throw because there's no record with id: 1
@@ -114,7 +114,7 @@ describe('Pending State', () => {
     afterEach(() => reset())
 
     test('pending state for model.create', async () => {
-      const createState = computed(() => messagesService.pendingById[1]?.create)
+      const createState = computed(() => messagesService.createPending[1])
       const handler = vi.fn()
       watch(() => createState.value, handler, { immediate: true })
 
@@ -131,7 +131,7 @@ describe('Pending State', () => {
     test('pending state for model.patch', async () => {
       const message = computed(() => messagesService.itemsById[0])
 
-      const patchState = computed(() => messagesService.pendingById[0]?.patch)
+      const patchState = computed(() => messagesService.isPatchPending[0])
       const handler = vi.fn()
       watch(() => patchState.value, handler, { immediate: true })
 
@@ -147,7 +147,7 @@ describe('Pending State', () => {
     })
 
     test('pending state for model.update', async () => {
-      const updateState = computed(() => messagesService.pendingById[0]?.update)
+      const updateState = computed(() => messagesService.isUpdatePending[0])
       const handler = vi.fn()
       watch(() => updateState.value, handler, { immediate: true })
 
@@ -161,7 +161,7 @@ describe('Pending State', () => {
     })
 
     test('pending state for model.remove', async () => {
-      const removeState = computed(() => messagesService.pendingById[0]?.remove)
+      const removeState = computed(() => messagesService.isRemovePending[0])
       const handler = vi.fn()
       watch(() => removeState.value, handler, { immediate: true })
 

@@ -1,11 +1,10 @@
-import { createPinia, defineStore } from 'pinia'
-import { BaseModel, useService } from '../src'
+import { createPinia } from 'pinia'
+import { BaseModel, useService, defineStore } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
 class Message extends BaseModel {
-  id: string
   foo: any
   additionalData: any
 

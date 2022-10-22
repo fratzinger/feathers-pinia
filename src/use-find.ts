@@ -1,5 +1,11 @@
 import type { Paginated, Params, QueryInfo } from './types'
-import type { FindFn, FindClassParamsStandalone, FindClassParams, CurrentQuery, ModelStatic } from './service/types'
+import type {
+  FindFn,
+  FindClassParamsStandalone,
+  FindClassParams,
+  CurrentQuery,
+  ModelConstructor,
+} from './service/types'
 import type { MaybeRef } from './utility-types'
 import { computed, ComputedRef, isReadonly, isRef, Ref, ref, unref, watch, WritableComputedRef } from 'vue-demi'
 import { usePageData } from './utils-pagination'
@@ -14,13 +20,13 @@ import {
 import { _ } from '@feathersjs/commons'
 import isEqual from 'fast-deep-equal'
 
-export function useFind<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>>(
-  params: MaybeRef<FindClassParamsStandalone<C, M>>,
+export function useFind<C extends ModelConstructor = ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(
+  params: MaybeRef<FindClassParamsStandalone>,
 ) {
   return new Find<C, M>(params)
 }
 
-export class Find<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>> {
+export class Find<C extends ModelConstructor = ModelConstructor, M extends InstanceType<C> = InstanceType<C>> {
   params: Ref<FindClassParams>
   onServer: boolean
   isSsr: ComputedRef<boolean>

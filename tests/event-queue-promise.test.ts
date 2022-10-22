@@ -1,8 +1,8 @@
 import { useQueuePromise, makeGetterName, makeState, resetState } from '../src/service/event-queue-promise'
-import { createPinia, defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { timeout } from './test-utils'
-import { BaseModel, useService } from '../src'
+import { BaseModel, useService, defineStore } from '../src'
 
 const pinia = createPinia()
 

@@ -9,6 +9,7 @@ import type {
   _StoreWithState,
 } from 'pinia'
 import type { UnwrapRef } from 'vue-demi'
+import { ModelConstructor } from '.'
 import { useService } from './use-service'
 
 export type Store2<SS> = Store2Without<
@@ -37,8 +38,8 @@ export type Store<SS> = _Store<
   _ExtractActionsFromSetupStore<SS>
 >
 
-export type GenericStore = Store<ReturnType<typeof useService>>
+export type GenericSS<C extends ModelConstructor = ModelConstructor, M = InstanceType<C>> = ReturnType<
+  typeof useService<C, M>
+>
 
-const store: GenericStore;
-
-store.
+export type GenericStore = Store<GenericSS>

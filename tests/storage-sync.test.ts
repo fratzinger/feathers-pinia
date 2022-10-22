@@ -1,9 +1,9 @@
 import { syncWithStorage } from '../src/storage-sync'
-import { createPinia, defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { vi } from 'vitest'
-import { BaseModel, useService } from '../src'
+import { BaseModel, useService, defineStore } from '../src'
 
 const pinia = createPinia()
 
@@ -35,7 +35,7 @@ describe('Storage Sync', () => {
     await timeout(600)
     expect(localStorageMock.setItem).toHaveBeenCalled()
     const [key, value] = (localStorageMock.setItem as any).mock.calls[0]
-    expect(key).toBe('service.messages')
+    expect(key).toBe('messages')
     const val = JSON.parse(value)
     expect(val.tempsById[msg[tempIdField]]).toBeTruthy()
   })
@@ -45,7 +45,7 @@ describe('Storage Sync', () => {
     await timeout(1000)
     expect(localStorageMock.getItem).toHaveBeenCalled()
     const [key, value] = (localStorageMock.getItem as any).mock.calls[0]
-    expect(key).toBe('service.messages')
+    expect(key).toBe('messages')
     expect(value).toBeUndefined()
   })
 })

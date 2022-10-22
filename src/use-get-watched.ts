@@ -1,9 +1,9 @@
-import type { ModelStatic, UseGetComputed, UseGetOptionsStandalone, UseGetState } from './service/types'
+import type { ModelConstructor, UseGetComputed, UseGetOptionsStandalone, UseGetState } from './service/types'
 import type { Id } from '@feathersjs/feathers'
 import type { Params } from './types'
 import { reactive, computed, toRefs, unref, watch } from 'vue-demi'
 
-export function useGetWatched<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>>({
+export function useGetWatched<C extends ModelConstructor, M extends InstanceType<C> = InstanceType<C>>({
   model,
   id,
   params = computed(() => ({})),
@@ -37,7 +37,7 @@ export function useGetWatched<C extends ModelStatic, M extends InstanceType<C> =
       if (unrefId === null) {
         return null
       }
-      return (model.getFromStore(unrefId, getParams()) as M) || null
+      return (model.store.getFromStore(unrefId, getParams()) as M) || null
     }),
     servicePath: computed(() => model.servicePath),
     isSsr: computed(() => model.store.isSsr),
@@ -52,7 +52,7 @@ export function useGetWatched<C extends ModelStatic, M extends InstanceType<C> =
       state.error = null
       state.hasBeenRequested = true
 
-      const request = paramsToUse != null ? model.get(idToUse, paramsToUse) : model.get(idToUse)
+      const request = paramsToUse != null ? model.store.get(idToUse, paramsToUse) : model.store.get(idToUse)
       state.request = request
 
       try {

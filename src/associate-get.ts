@@ -1,17 +1,22 @@
-import type { FindClassParams, ModelStatic } from './service/types'
+import type { FindClassParams, ModelConstructor } from './service/types'
 import type { HandleSetInstance } from './associate-utils'
 import type { Params } from './types'
 import type { Id } from '@feathersjs/feathers'
 import { getParams, setupAssociation } from './associate-utils'
+import { BaseModel } from './service'
 
-interface AssociateGetOptions<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>> {
+interface AssociateGetOptions<
+  M1 extends BaseModel,
+  C extends ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+> {
   Model: C
-  getId: (instance: M) => Id | null
-  makeParams?: (instance: M) => FindClassParams
-  handleSetInstance?: HandleSetInstance<M>
+  getId: (instance: M1) => Id | null
+  makeParams?: (instance: M1) => FindClassParams
+  handleSetInstance?: HandleSetInstance<M1, M>
   propUtilsPrefix?: string
 }
-export function associateGet<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>>(
+export function associateGet<C extends ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(
   instance: M,
   prop: string,
   { Model, getId, makeParams, handleSetInstance, propUtilsPrefix = '_' }: AssociateGetOptions<C>,

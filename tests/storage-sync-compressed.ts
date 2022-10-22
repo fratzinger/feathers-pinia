@@ -1,12 +1,10 @@
 import debounce from 'just-debounce'
 import { _ } from '@feathersjs/commons'
 import { computed, watch } from 'vue-demi'
-import lz from 'lz-string'
 
 // Writes data to localStorage
 export function writeToStorage(id: string, data: any, storage: any) {
-  const compressed = lz.compress(JSON.stringify(data))
-  storage.setItem(id, compressed)
+  storage.setItem(id, data)
 }
 
 // Reads and decompresses data from localStorage

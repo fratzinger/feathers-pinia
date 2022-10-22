@@ -1,5 +1,5 @@
-import { BaseModel, useService } from '../src/index' // from 'feathers-pinia'
-import { createPinia, defineStore } from 'pinia'
+import { BaseModel, useService, defineStore } from '../src/index' // from 'feathers-pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { Find, useFind } from '../src/use-find'

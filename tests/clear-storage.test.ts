@@ -1,6 +1,6 @@
 import { syncWithStorage } from '../src/storage-sync'
-import { createPinia, defineStore } from 'pinia'
-import { BaseModel, clearStorage, useService } from '../src/index'
+import { createPinia } from 'pinia'
+import { BaseModel, clearStorage, useService, defineStore } from '../src/index'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { vi } from 'vitest'
@@ -37,7 +37,7 @@ describe('Clear Storage', () => {
 
     expect(localStorageMock.setItem).toHaveBeenCalled()
     const [key] = (localStorageMock.setItem as any).mock.calls[0]
-    expect(key).toBe('service.messages')
+    expect(key).toBe('messages')
 
     clearStorage(localStorageMock)
     expect(localStorageMock.removeItem).toHaveBeenCalled()

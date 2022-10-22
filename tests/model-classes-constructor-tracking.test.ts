@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BaseModel, useService } from '../src/index' // from 'feathers-pinia'
-import { createPinia, defineStore } from 'pinia'
+import { BaseModel, useService, defineStore } from '../src/index' // from 'feathers-pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 
 const pinia = createPinia()
@@ -51,7 +51,7 @@ describe('Tracking Constructor Run Counts', () => {
     const messagesService = useMessagesService(pinia)
 
     // Test
-    const message = new Message({ text: 'Here I am!' }).addToStore() as Message
+    const message = new Message({ text: 'Here I am!' }).addToStore()
     expect(runCount).toBe(1)
   })
 
@@ -73,7 +73,7 @@ describe('Tracking Constructor Run Counts', () => {
     const messagesService = useMessagesService(pinia)
 
     // Test
-    const message = (await new Message({ text: 'Here I am!' }).addToStore().save()) as Message
+    const message = await new Message({ text: 'Here I am!' }).addToStore().save()
     expect(runCount).toBe(1)
   })
 
@@ -95,7 +95,7 @@ describe('Tracking Constructor Run Counts', () => {
     const messagesService = useMessagesService(pinia)
 
     // Test
-    const message = (await new Message({ text: 'Here I am!' }).addToStore().clone()) as Message
+    const message = new Message({ text: 'Here I am!' }).addToStore().clone()
     expect(runCount).toBe(1)
   })
 
@@ -117,7 +117,7 @@ describe('Tracking Constructor Run Counts', () => {
     const messagesService = useMessagesService(pinia)
 
     // Test
-    const message = (await new Message({ text: 'Here I am!' }).addToStore().clone().commit()) as Message
+    const message = new Message({ text: 'Here I am!' }).addToStore().clone().commit()
     expect(runCount).toBe(1)
   })
 })

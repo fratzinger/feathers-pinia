@@ -1,5 +1,5 @@
-import { createPinia, defineStore } from 'pinia'
-import { BaseModel, models, useService } from '../src/index'
+import { createPinia } from 'pinia'
+import { BaseModel, useService, defineStore } from '../src/index'
 import { api } from './feathers'
 
 const pinia = createPinia()
@@ -24,11 +24,6 @@ describe('Model Class', () => {
       text: 'Quick, what is the number to 911?',
     })
     expect(message.constructor.name).toBe('Message')
-  })
-
-  test('registering a model adds it to the models object', () => {
-    expect(models).toHaveProperty('api')
-    expect(models.api).toHaveProperty('Message')
   })
 
   test('Model class is available on the store as a getter', () => {

@@ -1,13 +1,12 @@
 import { computed, ref } from 'vue-demi'
-import { createPinia, defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
-import { BaseModel, useGetWatched, useService } from '../src'
+import { BaseModel, useGetWatched, useService, defineStore } from '../src'
 
 const pinia = createPinia()
 
 class Message extends BaseModel {
-  id: number | string
   static modelName = 'Message'
 }
 

@@ -1,19 +1,22 @@
 import type { Params } from './types'
-import type { GetFn, GetClassParamsStandalone, GetClassParams, ModelStatic } from './service/types'
+import type { GetFn, GetClassParamsStandalone, GetClassParams, ModelConstructor } from './service/types'
 import type { MaybeRef } from './utility-types'
 import type { Id } from '@feathersjs/feathers'
 import { computed, ComputedRef, isReadonly, isRef, Ref, ref, unref, watch } from 'vue-demi'
 
-type Store<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>> = ServiceStoreDefault<C, M>
+type Store<
+  C extends ModelConstructor = ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+> = ServiceStoreDefault<C, M>
 
-export function useGet<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>>(
+export function useGet<C extends ModelConstructor = ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(
   id: Id,
   params: MaybeRef<GetClassParamsStandalone<C, M>>,
 ) {
   return new Get<C, M>(id, params)
 }
 
-export class Get<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>> {
+export class Get<C extends ModelConstructor = ModelConstructor, M extends InstanceType<C> = InstanceType<C>> {
   id: Ref<Id | null>
   params: Ref<GetClassParams>
   isSsr: ComputedRef<boolean>

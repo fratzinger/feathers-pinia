@@ -1,5 +1,5 @@
-import { BaseModel, Get, useGet, useService } from '../src/index' // from 'feathers-pinia'
-import { createPinia, defineStore } from 'pinia'
+import { BaseModel, Get, useGet, useService, defineStore } from '../src/index' // from 'feathers-pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { ref } from 'vue-demi'

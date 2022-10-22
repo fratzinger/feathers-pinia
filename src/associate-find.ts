@@ -1,18 +1,27 @@
-import type { FindClassParams, FindClassParamsStandalone, AssociateFindUtils, ModelStatic } from './service/types'
-import { getParams, setupAssociation } from './associate-utils'
+import type { FindClassParams, FindClassParamsStandalone, AssociateFindUtils, ModelConstructor } from './service/types'
+import { getParams, HandleSetInstance, setupAssociation } from './associate-utils'
 import { Find, useFind } from './use-find'
 import { MaybeRef } from './utility-types'
+import { BaseModel } from './service'
 
-interface AssociateFindOptions<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>> {
+interface AssociateFindOptions<
+  M1 extends BaseModel,
+  C extends ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+> {
   Model: C
-  makeParams: (instance: M) => FindClassParams
-  handleSetInstance?: (this: M, associatedRecord: M) => void
+  makeParams: (instance: M1) => FindClassParams
+  handleSetInstance?: HandleSetInstance<M1, M>
   propUtilsPrefix?: string
 }
-export function associateFind<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>>(
-  instance: M,
+export function associateFind<
+  M1 extends BaseModel,
+  C extends ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+>(
+  instance: M1,
   prop: string,
-  { Model, makeParams, handleSetInstance, propUtilsPrefix = '_' }: AssociateFindOptions<C>,
+  { Model, makeParams, handleSetInstance, propUtilsPrefix = '_' }: AssociateFindOptions<M1, C, M>,
 ) {
   // cache the initial data in a variable
   const initialData = (instance as any)[prop]

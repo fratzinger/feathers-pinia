@@ -1,20 +1,13 @@
-import type {
-  Association,
-  BaseModelAssociations,
-  FindClassParams,
-  FindClassParamsStandalone,
-  ModelStatic,
-  ServiceStoreDefault,
-} from './service/types'
-import { BaseModel } from './service'
+import type { Association, BaseModelAssociations, FindClassParams, FindClassParamsStandalone } from './service/types'
+import { BaseModel, ModelConstructor } from './service'
 
-export type HandleSetInstance<M> = (this: M, associatedRecord: M) => void
+export type HandleSetInstance<M1, M2> = (this: M1, associatedRecord: M2) => void
 
 export function getParams<M extends BaseModel>(
   instance: any,
-  store: ServiceStoreDefault<M>,
+  store: any,
   makeParams?: (instance: M) => FindClassParams,
-): FindClassParamsStandalone<M> | void {
+): FindClassParamsStandalone | void {
   if (makeParams) {
     const params = makeParams(instance)
     if (params.temps !== false) params.temps = true
@@ -23,13 +16,13 @@ export function getParams<M extends BaseModel>(
   }
 }
 
-function defaultHandleSetInstance<M>(associatedRecord: M) {
+function defaultHandleSetInstance<M1 extends BaseModel, C extends ModelConstructor>(associatedRecord: M1) {
   return associatedRecord
 }
 
-export function setupAssociation<C extends ModelStatic, M extends InstanceType<C> = InstanceType<C>>(
-  instance: M,
-  handleSetInstance: any,
+export function setupAssociation<M1 extends BaseModel, C extends ModelConstructor, M = InstanceType<C>>(
+  instance: M1,
+  handleSetInstance: HandleSetInstance<M1, M> | undefined,
   prop: string,
   Model: C,
   propUtilsPrefix: string,

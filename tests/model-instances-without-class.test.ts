@@ -1,11 +1,11 @@
-import { createPinia, defineStore } from 'pinia'
-import { useService } from '../src'
+import { createPinia } from 'pinia'
+import { useService, defineStore } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
 const servicePath = 'messages'
-const useMessagesService = defineStore('messages', () => useService({ servicePath }))
+const useMessagesService = defineStore('messages', () => useService({ servicePath, app: api }))
 
 const messagesService = useMessagesService(pinia)
 

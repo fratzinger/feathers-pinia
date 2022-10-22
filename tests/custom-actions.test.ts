@@ -1,10 +1,10 @@
 import { computed } from 'vue-demi'
-import { createPinia, defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { timeout } from './test-utils'
 import { useFindWatched } from '../src/use-find-watched'
 import { vi } from 'vitest'
-import { BaseModel, useService } from '../src'
+import { BaseModel, useService, defineStore } from '../src'
 
 describe('Custom Actions', () => {
   test('adds custom actions to the store', async () => {
@@ -38,8 +38,9 @@ describe('Custom Actions', () => {
         Model: BaseModel,
         app: api,
       })
+
       function findMessages(params: any) {
-        return useFindWatched({ params, model: this })
+        return useFindWatched({ params, model: BaseModel })
       }
 
       return {
@@ -60,33 +61,5 @@ describe('Custom Actions', () => {
     await timeout(100)
 
     expect(data.items.value).toHaveLength(1)
-  })
-
-  test('custom actions are added to the model class', () => {
-    const pinia = createPinia()
-    class Message extends BaseModel {
-      static test: Function
-    }
-    const useMessagesService = defineStore('messages', () => {
-      const serviceStore = useService({
-        servicePath: 'messages',
-        Model: Message,
-        app: api,
-      })
-
-      function test() {
-        serviceStore.idField.value = 'moose'
-      }
-
-      return {
-        ...serviceStore,
-        test,
-      }
-    })
-    const messagesService = useMessagesService(pinia)
-
-    Message.test()
-
-    expect(messagesService.idField).toBe('moose')
   })
 })

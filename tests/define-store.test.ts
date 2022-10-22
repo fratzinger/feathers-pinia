@@ -1,5 +1,5 @@
-import { createPinia, defineStore } from 'pinia'
-import { BaseModel, useService } from '../src'
+import { createPinia } from 'pinia'
+import { BaseModel, useService, defineStore } from '../src'
 import { api } from './feathers'
 import { ref, computed } from 'vue-demi'
 
@@ -45,7 +45,7 @@ describe('Define User Store', () => {
     expect(store.isSsr).toBe(true)
     expect(store.idField).toBe('id')
     expect(store.tempIdField).toBe('__tempId')
-    expect(store.$id).toBe('service.users')
+    expect(store.$id).toBe('users')
     expect(store.servicePath).toBe('users')
     expect(store.firstName).toBe('Bob')
     expect(store.fullName).toBe('Bob Smith')

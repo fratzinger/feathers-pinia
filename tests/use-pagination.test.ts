@@ -1,10 +1,10 @@
 import { computed, ref, reactive } from 'vue-demi'
-import { createPinia, defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { timeout } from './test-utils'
 import { useFindWatched } from '../src/use-find-watched'
 import { usePagination } from '../src/use-pagination'
-import { BaseModel, useService } from '../src'
+import { BaseModel, useService, defineStore } from '../src'
 
 const pinia = createPinia()
 

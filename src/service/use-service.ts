@@ -47,9 +47,9 @@ import { useGet as _useGet } from '../use-get'
 import { useFindWatched as _useFindWatched } from '../use-find-watched'
 import { useGetWatched as _useGetWatched } from '../use-get-watched'
 import { defaultIdField, defaultTempIdField } from './utils'
-import { BaseModel } from '.'
+import { BaseModel } from './base-model'
 
-export type UseFeathersServiceOptions<C extends ModelConstructor = ModelConstructor> = {
+export type UseFeathersServiceOptions<C extends ModelConstructor = ModelConstructor, M = InstanceType<C>> = {
   app: Application
   Model?: C
   idField?: string
@@ -74,7 +74,7 @@ const FILTERS = ['$sort', '$limit', '$skip', '$select']
 const additionalOperators = ['$elemMatch']
 
 export const useService = <C extends ModelConstructor = ModelConstructor, M = InstanceType<C>>(
-  _options: UseFeathersServiceOptions<C>,
+  _options: UseFeathersServiceOptions<C, M>,
 ) => {
   const options = Object.assign({}, defaultSharedState, _options)
 
@@ -103,7 +103,6 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
   const clonesById = ref({}) as Ref<Record<string | number | symbol, M>>
 
   Object.assign(_Model, {
-    store: this,
     servicePath: options.servicePath,
     idField: idField.value,
     tempIdField: tempIdField.value,
@@ -208,7 +207,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
 
     // Make sure items are instances
     values = values.map((item) => {
-      if (item && item instanceof Model.value) {
+      if (item && !(item instanceof _Model)) {
         item = addOrUpdate(item)
       }
       return item
@@ -234,7 +233,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     return findInStore.value(params).total
   })
 
-  const getFromStore = computed(() => (id: Id | null, params?: Params) => {
+  const getFromStore = computed(() => (id: Id | null, params?: Params): M | null => {
     id = unref(id)
     params = fastCopy(unref(params) || {})
 
@@ -245,12 +244,28 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     if (existingItem) item = existingItem
     else if (tempItem) item = tempItem
 
-    // Make sure item is an instance
-    if (item && !item.constructor.modelName) {
-      // @ts-expect-error access action in getter is not intended
-      item = this.addOrUpdate(item)
+    if (!item) {
+      return null
     }
+
+    // Make sure item is an instance
+    if (!(item instanceof _Model)) {
+      return addOrUpdate(item)
+    }
+
     return item
+  })
+
+  const isFindPending = computed(() => {
+    return isPending.value.find > 0
+  })
+
+  const isCountPending = computed(() => {
+    return isPending.value.count > 0
+  })
+
+  const isGetPending = computed(() => {
+    return isPending.value.get > 0
   })
 
   const isCreatePending = computed(() => {
@@ -411,22 +426,22 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
   async function create(data: AnyDataOrArray, _params?: MaybeRef<Params>): Promise<M | M[]> {
     const params = getSaveParams(_params)
 
-    const id = idField.value
-    const tempId = tempIdField.value
+    const _idField = idField.value
+    const _tempIdField = tempIdField.value
 
     if (!Array.isArray(data)) {
-      setPendingById(getId(data, id) || data[tempId], 'create', true)
+      setPendingById(getId(data, _idField) || data[_tempIdField], 'create', true)
     }
 
     try {
-      const response = await service.value.create(cleanData(data, Model.value.tempIdField), params)
-      const restoredTempIds = restoreTempIds(data, response, Model.value.tempIdField)
+      const response = await service.value.create(cleanData(data, _tempIdField), params)
+      const restoredTempIds = restoreTempIds(data, response, _tempIdField)
       return addOrUpdate(restoredTempIds)
     } catch (error) {
       return await Promise.reject(error)
     } finally {
       if (!Array.isArray(data)) {
-        setPendingById(getId(data, id) || data[tempId], 'create', false)
+        setPendingById(getId(data, _idField) || data[_tempIdField], 'create', false)
       }
     }
   }
@@ -525,12 +540,12 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
   function addOrUpdate(data: AnyData): M
   function addOrUpdate(data: AnyData[]): M[]
   function addOrUpdate(data: AnyDataOrArray): MaybeArray<any> {
-    const id = idField.value
-    const tempId = tempIdField.value
+    const _idField = idField.value
+    const _tempIdField = tempIdField.value
     const { items, isArray } = getArray(data)
 
     const _items = items.map((item: AnyData) => {
-      if (getId(item, id) != null && getTempId(item, tempId) != null) {
+      if (getId(item, _idField) != null && getTempId(item, _tempIdField) != null) {
         return moveTempToItems(item)
       } else {
         return _addOrMergeToStore(item)
@@ -544,18 +559,16 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     const _idField = idField.value
     const _tempIdField = tempIdField.value
     const id = getId(data, _idField)
-    if (!id) return
+    if (id == undefined) return
     const tempId = getTempId(data, _tempIdField)
     const existingTemp = tempsById.value[tempId]
     if (existingTemp) {
       set(itemsById.value, id, Object.assign(existingTemp, data))
       del(tempsById.value, tempId)
-      if (itemsById.value[id]) {
-        del(itemsById.value[id], tempIdField)
-      }
+      del(itemsById.value[id], _tempIdField)
     }
-    del(data, tempIdField)
-    return itemsById.value[id as Id]
+    del(data, _tempIdField)
+    return itemsById.value[id]
   }
 
   function clearAll() {
@@ -591,11 +604,11 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
 
       // Store and return the clone
       set(clonesById.value, id, clone)
-      return clonesById.value[id] as M // Must return the item from the store
+      return clonesById.value[id] // Must return the item from the store
     }
   }
 
-  function commit(item: M, data = {}): M | undefined {
+  function commit(item: M, data = {}) {
     const id = getAnyId(item, Model.value.tempIdField, Model.value.idField)
     if (id != null) {
       const tempId = getTempId(item, Model.value.tempIdField)
@@ -607,11 +620,11 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
 
       set(placeToStore, id, newOriginal)
 
-      return placeToStore[id] as M
+      return placeToStore[id]
     }
   }
 
-  function reset(item: M, data = {}): M {
+  function reset(item: M, data = {}) {
     const tempId = getTempId(item, Model.value.tempIdField)
     const placeToStore = tempId != null ? tempsById.value : itemsById.value
     const id = getAnyId(item, Model.value.tempIdField, Model.value.idField)
@@ -669,7 +682,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     }
 
     // @ts-expect-error todo
-    const existingPageData = this.pagination[qid]?.[queryId]?.[pageId as string]
+    const existingPageData = pagination.value[qid]?.[queryId]?.[pageId as string]
 
     const qidData = pagination.value[qid] || {}
     Object.assign(qidData, { mostRecent })
@@ -773,6 +786,10 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     findInStore,
     countInStore,
     getFromStore,
+    setPendingById,
+    isFindPending,
+    isCountPending,
+    isGetPending,
     isCreatePending,
     isUpdatePending,
     isPatchPending,
@@ -818,5 +835,3 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
 
   return store
 }
-
-export GenericStore = Store

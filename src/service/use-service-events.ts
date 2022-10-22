@@ -1,6 +1,5 @@
 import { getId, hasOwn } from '../utils'
 import _debounce from 'just-debounce'
-import { models } from '../models'
 import { HandledEvent, HandleEvents } from '../types'
 import { ModelConstructor } from './types'
 import { del, ref, set } from 'vue-demi'
@@ -87,7 +86,7 @@ export const useServiceEvents = <C extends ModelConstructor = ModelConstructor>(
     }
 
     if (handler) {
-      const handled = handler(item, { model: Model, models })
+      const handled = handler(item, { model: Model })
       if (!handled) {
         return
       }

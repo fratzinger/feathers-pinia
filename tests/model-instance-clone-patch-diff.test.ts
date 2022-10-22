@@ -1,13 +1,12 @@
 import { vi } from 'vitest'
-import { createPinia, defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
-import { BaseModel, useService } from '../src'
+import { BaseModel, useService, defineStore } from '../src'
 
 const pinia = createPinia()
 
 class Message extends BaseModel {
-  id: string
   text = ''
   other = ''
   userId: null | number = null

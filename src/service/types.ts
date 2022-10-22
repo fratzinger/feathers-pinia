@@ -121,7 +121,6 @@ export interface ModelInstanceOptions {
 }
 
 export interface BaseModelModifierOptions {
-  models: Record<string, any>
   store: any
 }
 
@@ -156,11 +155,9 @@ export interface GetClassParams extends Params {
   onServer?: boolean
   immediate?: boolean
 }
-export interface GetClassParamsStandalone<
-  C extends ModelConstructor = ModelConstructor,
-  M extends InstanceType<C> = InstanceType<C>,
-> extends GetClassParams {
-  store: ServiceStoreDefault<C>
+export interface GetClassParamsStandalone<C extends ModelConstructor = ModelConstructor, M = InstanceType<C>>
+  extends GetClassParams {
+  store: any
 }
 export interface FindClassParams extends Params {
   query: Query
@@ -169,11 +166,8 @@ export interface FindClassParams extends Params {
   immediate?: boolean
   watch?: boolean
 }
-export interface FindClassParamsStandalone<
-  C extends ModelConstructor = ModelConstructor,
-  M extends InstanceType<C> = InstanceType<C>,
-> extends FindClassParams {
-  store: ServiceStoreDefault<C, M>
+export interface FindClassParamsStandalone extends FindClassParams {
+  store: any
 }
 
 export interface UseFindWatchedOptions {

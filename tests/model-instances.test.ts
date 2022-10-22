@@ -1,13 +1,11 @@
-import { createPinia, defineStore } from 'pinia'
-import { BaseModel, useService } from '../src'
+import { createPinia } from 'pinia'
+import { BaseModel, useService, defineStore } from '../src'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 
 const pinia = createPinia()
 
-class Message extends BaseModel {
-  id: number
-}
+class Message extends BaseModel {}
 const servicePath = 'messages'
 const useMessages = defineStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
 

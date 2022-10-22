@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BaseModel, useService } from '../src/index' // from 'feathers-pinia'
-import { createPinia, defineStore } from 'pinia'
+import { BaseModel, useService, defineStore } from '../src/index' // from 'feathers-pinia'
+import { createPinia } from 'pinia'
 import { api } from './feathers'
 
 const pinia = createPinia()

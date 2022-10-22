@@ -1,10 +1,13 @@
-import type { UseFindComputed, UseFindWatchedOptionsStandalone, UseFindState, ModelStatic } from './service/types'
+import type { UseFindComputed, UseFindWatchedOptionsStandalone, UseFindState, ModelConstructor } from './service/types'
 import type { Params, Paginated } from './types'
 import { computed, reactive, Ref, unref, toRefs, watch } from 'vue-demi'
 import debounce from 'just-debounce'
 import { getQueryInfo, makeUseFindItems } from './utils'
 
-export function useFindWatched<C extends ModelStatic = ModelStatic, M extends InstanceType<C> = InstanceType<C>>({
+export function useFindWatched<
+  C extends ModelConstructor = ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+>({
   model,
   params = computed(() => null),
   fetchParams = computed(() => undefined),
@@ -92,7 +95,7 @@ export function useFindWatched<C extends ModelStatic = ModelStatic, M extends In
     state.isPending = true
     state.haveBeenRequested = true
 
-    const request = model.find(params).then((response: any) => {
+    const request = model.store.find(params).then((response: any) => {
       // To prevent thrashing, only clear error on response, not on initial request.
       state.error = null
       state.haveLoaded = true

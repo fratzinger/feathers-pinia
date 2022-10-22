@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue-demi'
-import { createPinia, defineStore } from 'pinia'
-import { useFindWatched, QueryWhenContext, QueryWhenFunction, BaseModel, useService } from '../src'
+import { createPinia } from 'pinia'
+import { useFindWatched, QueryWhenContext, QueryWhenFunction, BaseModel, useService, defineStore } from '../src'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { vi } from 'vitest'
