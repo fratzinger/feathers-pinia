@@ -158,19 +158,11 @@ export function getArray<T>(data: T | T[]) {
 
 export const hasOwn = (obj: AnyData, prop: PropertyKey) => Object.prototype.hasOwnProperty.call(obj, prop)
 
-export function getSaveParams<P extends Params>(params?: MaybeRef<P>): P | {} {
+export function getSaveParams(params?: Params) {
   if (!params) {
     return {}
   }
   return fastCopy(unref(params))
-}
-
-export function markAsClone<T>(item: T) {
-  Object.defineProperty(item, '__isClone', {
-    value: true,
-    enumerable: false,
-  })
-  return item
 }
 
 /**
@@ -222,7 +214,7 @@ export function diff(original: AnyData, clone: AnyData, diffDef: DiffDefinition)
 }
 
 export const setOnRef = (obj: MaybeRef<AnyData>, key: string, val: number) => {
-  ;(obj.value || obj)[key] = val
+  (obj.value || obj)[key] = val
 }
 export const computedAttr = (obj: any, key: string) =>
   computed({

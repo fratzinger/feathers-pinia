@@ -75,7 +75,7 @@ export type PaginationStateQid =
       mostRecent: MostRecentQuery
     }
 
-export type HandleFindResponseOptions = { params: Params; response: any }
+export type HandleFindResponseOptions = { params: Params; response: AnyData[] | Paginated<AnyData> }
 export type HandleFindErrorOptions = { params: Params; error: any }
 
 // The find action will always return data at params.data, even for non-paginated requests.
