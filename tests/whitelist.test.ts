@@ -1,12 +1,12 @@
 import { createPinia } from 'pinia'
-import { useService, defineStore } from '../src'
+import { useService, defineServiceStore } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
 describe('whitelist', () => {
   test('adds whitelist to the state', async () => {
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', whitelist: ['$regex'], app: api }),
     )
     const messagesService = useMessagesService(pinia)
@@ -15,7 +15,7 @@ describe('whitelist', () => {
   })
 
   test('find getter fails without whitelist', async () => {
-    const useLettersService = defineStore('letters', () =>
+    const useLettersService = defineServiceStore('letters', () =>
       useService({ servicePath: 'letters', whitelist: ['$regex'], app: api }),
     )
     const lettersService = useLettersService(pinia)
@@ -26,7 +26,7 @@ describe('whitelist', () => {
   })
 
   test('enables custom query params for the find getter', async () => {
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', whitelist: ['$regex'], app: api }),
     )
     const messagesService = useMessagesService(pinia)
@@ -45,7 +45,7 @@ describe('whitelist', () => {
   })
 
   test('retrieves custom query params ($options) from the service options', async () => {
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', whitelist: ['$regex'], app: api }),
     )
     const messagesService = useMessagesService(pinia)

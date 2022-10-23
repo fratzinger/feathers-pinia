@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue-demi'
 import { createPinia } from 'pinia'
-import { useFindWatched, QueryWhenContext, QueryWhenFunction, BaseModel, useService, defineStore } from '../src'
+import { useFindWatched, QueryWhenContext, QueryWhenFunction, BaseModel, useService, defineServiceStore } from '../src'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { vi } from 'vitest'
@@ -14,13 +14,15 @@ function createTestContext() {
   }
 
   const servicePath = 'messages'
-  const useMessagesService = defineStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
+  const useMessagesService = defineServiceStore(servicePath, () =>
+    useService({ servicePath, Model: Message, app: api }),
+  )
 
   const messagesService = useMessagesService(pinia)
 
   const reset = () => resetStores(api.service('messages'), messagesService)
 
-  return { pinia, defineStore, BaseModel, Message, messagesService, reset }
+  return { pinia, defineServiceStore, BaseModel, Message, messagesService, reset }
 }
 
 describe('useFindWatched', () => {

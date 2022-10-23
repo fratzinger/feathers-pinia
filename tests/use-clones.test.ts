@@ -1,5 +1,5 @@
 import { createPinia } from 'pinia'
-import { BaseModel, useClones, useService, defineStore } from '../src/index'
+import { BaseModel, useClones, useService, defineServiceStore } from '../src/index'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { reactive } from 'vue-demi'
@@ -17,7 +17,7 @@ class Message extends BaseModel {
 }
 
 const servicePath = 'messages'
-const useMessagesService = defineStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
+const useMessagesService = defineServiceStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
 const messagesService = useMessagesService(pinia)
 const reset = () => resetStores(api.service('messages'), messagesService)
 

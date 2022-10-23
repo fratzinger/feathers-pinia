@@ -2,12 +2,12 @@ import { computed } from 'vue-demi'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
-import { BaseModel, useService, defineStore } from '../src'
+import { BaseModel, useService, defineServiceStore } from '../src'
 
 const pinia = createPinia()
 
 class Message extends BaseModel {}
-const useMessagesService = defineStore('messages', () =>
+const useMessagesService = defineServiceStore('messages', () =>
   useService({ servicePath: 'messages', Model: Message, app: api }),
 )
 const messagesService = useMessagesService(pinia)

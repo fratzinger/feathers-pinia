@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { Paginated, Params, QueryInfo } from '../src/types'
 import { getQueryInfo } from '../src/utils'
-import { BaseModel, useService, defineStore } from '../src'
+import { BaseModel, useService, defineServiceStore } from '../src'
 
 const resetStore = () => {
   api.service('messages').store = {}
@@ -21,7 +21,7 @@ describe('server side rendering', () => {
     }
 
     const servicePath = 'messages'
-    const useMessagesService = defineStore(servicePath, () =>
+    const useMessagesService = defineServiceStore(servicePath, () =>
       useService({ servicePath, Model: Message, app: api, ssr: isSsr }),
     )
 
@@ -73,7 +73,7 @@ describe('server side rendering', () => {
     }
 
     const servicePath = 'messages'
-    const useMessagesService = defineStore(servicePath, () =>
+    const useMessagesService = defineServiceStore(servicePath, () =>
       useService({ servicePath, Model: Message, app: api, ssr: isSsr }),
     )
 

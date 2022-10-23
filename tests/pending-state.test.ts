@@ -2,7 +2,7 @@ import { watch, computed } from 'vue-demi'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
-import { BaseModel, RequestTypeById, useService, defineStore } from '../src'
+import { BaseModel, RequestTypeById, useService, defineServiceStore } from '../src'
 import { vi } from 'vitest'
 
 const pinia = createPinia()
@@ -12,7 +12,7 @@ class Message extends BaseModel {
 }
 
 const servicePath = 'messages'
-const useMessagesService = defineStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
+const useMessagesService = defineServiceStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
 
 const messagesService = useMessagesService(pinia)
 

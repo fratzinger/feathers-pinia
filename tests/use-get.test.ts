@@ -1,4 +1,4 @@
-import { BaseModel, Get, useGet, useService, defineStore } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, Get, useGet, useService, defineServiceStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
@@ -17,7 +17,7 @@ export class Message extends BaseModel {
   }
 }
 
-const useMessagesService = defineStore('messages', () =>
+const useMessagesService = defineServiceStore('messages', () =>
   useService({ servicePath: 'messages', Model: Message, app: api }),
 )
 const messageStore = useMessagesService(pinia)

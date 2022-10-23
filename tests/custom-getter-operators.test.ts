@@ -1,6 +1,6 @@
 import sift, { createEqualsOperation } from 'sift'
 import { like, iLike, operations } from '../src/utils-custom-operators'
-import { BaseModel, useService, defineStore } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, useService, defineServiceStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
@@ -17,7 +17,7 @@ export class Message extends BaseModel {
   }
 }
 
-const useMessagesService = defineStore('messages', () =>
+const useMessagesService = defineServiceStore('messages', () =>
   useService({ servicePath: 'messages', Model: Message, app: api }),
 )
 const messageStore = useMessagesService(pinia)

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { BaseModel, useService, defineStore } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, useService, defineServiceStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 
@@ -23,7 +23,7 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', Model: Message, app: api }),
     )
     const messagesService = useMessagesService(pinia)
@@ -45,7 +45,7 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', Model: Message, app: api }),
     )
     const messagesService = useMessagesService(pinia)
@@ -67,7 +67,7 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', Model: Message, app: api }),
     )
     const messagesService = useMessagesService(pinia)
@@ -89,7 +89,7 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', Model: Message, app: api }),
     )
     const messagesService = useMessagesService(pinia)
@@ -111,7 +111,7 @@ describe('Tracking Constructor Run Counts', () => {
         runCount++
       }
     }
-    const useMessagesService = defineStore('messages', () =>
+    const useMessagesService = defineServiceStore('messages', () =>
       useService({ servicePath: 'messages', Model: Message, app: api }),
     )
     const messagesService = useMessagesService(pinia)

@@ -1,7 +1,7 @@
-import { defineStore as _defineStore, Pinia } from 'pinia'
+import { defineStore, Pinia } from 'pinia'
 
-export const defineStore = <Id extends string, SS>(id: Id, setupStore: () => SS) => {
-  const storeDefinition = _defineStore(id, setupStore)
+export const defineServiceStore = <Id extends string, SS>(id: Id, setupStore: () => SS) => {
+  const storeDefinition = defineStore(id, setupStore)
 
   return (pinia?: Pinia) => {
     const store = storeDefinition(pinia)

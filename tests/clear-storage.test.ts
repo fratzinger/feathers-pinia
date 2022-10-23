@@ -1,6 +1,6 @@
 import { syncWithStorage } from '../src/storage-sync'
 import { createPinia } from 'pinia'
-import { BaseModel, clearStorage, useService, defineStore } from '../src/index'
+import { BaseModel, clearStorage, useService, defineServiceStore } from '../src/index'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { vi } from 'vitest'
@@ -8,7 +8,7 @@ import { vi } from 'vitest'
 const pinia = createPinia()
 
 class Message extends BaseModel {}
-const useMessagesService = defineStore('messages', () =>
+const useMessagesService = defineServiceStore('messages', () =>
   useService({ servicePath: 'messages', Model: Message, app: api }),
 )
 const messagesService = useMessagesService(pinia)

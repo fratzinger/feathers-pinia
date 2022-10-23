@@ -4,14 +4,14 @@ import { api } from './feathers'
 import { timeout } from './test-utils'
 import { useFindWatched } from '../src/use-find-watched'
 import { vi } from 'vitest'
-import { BaseModel, useService, defineStore } from '../src'
+import { BaseModel, useService, defineServiceStore } from '../src'
 
 describe('Custom Actions', () => {
   test('adds custom actions to the store', async () => {
     const pinia = createPinia()
     const test = vi.fn()
     class Message extends BaseModel {}
-    const useMessagesService = defineStore('messages', () => {
+    const useMessagesService = defineServiceStore('messages', () => {
       const serviceStore = useService({
         servicePath: 'messages',
         Model: Message,
@@ -32,7 +32,7 @@ describe('Custom Actions', () => {
 
   test('supports useFind as a customAction', async () => {
     const pinia = createPinia()
-    const useMessagesService: any = defineStore('messages', () => {
+    const useMessagesService: any = defineServiceStore('messages', () => {
       const serviceStore = useService({
         servicePath: 'messages',
         Model: BaseModel,

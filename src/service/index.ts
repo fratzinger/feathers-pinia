@@ -1,5 +1,5 @@
 export * from './base-model'
 export * from './use-service'
 export * from './event-queue-promise'
-export * from './define-store'
+export * from './define-service-store'
 export * from './types'

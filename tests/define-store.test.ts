@@ -1,5 +1,5 @@
 import { createPinia } from 'pinia'
-import { BaseModel, useService, defineStore } from '../src'
+import { BaseModel, useService, defineServiceStore } from '../src'
 import { api } from './feathers'
 import { ref, computed } from 'vue-demi'
 
@@ -38,7 +38,7 @@ const makeStore = ({ servicePath }) => {
 }
 
 describe('Define User Store', () => {
-  const useUsersStore = defineStore('users', () => makeStore({ servicePath: 'users' }))
+  const useUsersStore = defineServiceStore('users', () => makeStore({ servicePath: 'users' }))
   const store = useUsersStore(pinia)
 
   test('can interact with store', async () => {
