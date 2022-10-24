@@ -92,7 +92,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     _Model.modelName = _Model.name
   }
 
-  const servicePath = computed(() => _options.servicePath)
+  const servicePath = ref(_options.servicePath)
   const service = computed(() => {
     return options.app.service(servicePath.value)
   })
@@ -316,7 +316,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
    *         Feathers client.  The client modifies the params object.
    *   @param response
    */
-  async function _handleFindResponse({ params, response }: HandleFindResponseOptions) {
+  async function _handleFindResponse({ params, response }: HandleFindResponseOptions<M>) {
     const id = idField.value
     const { qid = 'default', query, preserveSsr = false } = params
     // Normalize response so data is always found at response.data
@@ -331,7 +331,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     const data = paginated.data
     const mappedFromState = data.map((item) => itemsById.value[getId(item, id) as Id])
     if (mappedFromState[0] !== undefined) {
-      paginated.data ? (paginated.data = mappedFromState) : (paginated = mappedFromState)
+      paginated.data = paginated.data = mappedFromState
     }
 
     return paginated
