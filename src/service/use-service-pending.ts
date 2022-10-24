@@ -15,10 +15,10 @@ const defaultPending = () => ({
 export const useServicePending = () => {
   const isPending = ref(defaultPending())
 
-  const createPending = ref({}) as Ref<Record<string | number | symbol, true>>
-  const updatePending = ref({}) as Ref<Record<string | number | symbol, true>>
-  const patchPending = ref({}) as Ref<Record<string | number | symbol, true>>
-  const removePending = ref({}) as Ref<Record<string | number | symbol, true>>
+  const createPendingById = ref({}) as Ref<Record<string | number | symbol, true>>
+  const updatePendingById = ref({}) as Ref<Record<string | number | symbol, true>>
+  const patchPendingById = ref({}) as Ref<Record<string | number | symbol, true>>
+  const removePendingById = ref({}) as Ref<Record<string | number | symbol, true>>
 
   const isFindPending = computed(() => {
     return isPending.value.find > 0
@@ -33,19 +33,19 @@ export const useServicePending = () => {
   })
 
   const isCreatePending = computed(() => {
-    return isPending.value.create > 0
+    return isPending.value.create > 0 || Object.keys(createPendingById.value).length > 0
   })
 
   const isUpdatePending = computed(() => {
-    return isPending.value.update > 0
+    return isPending.value.update > 0 || Object.keys(updatePendingById.value).length > 0
   })
 
   const isPatchPending = computed(() => {
-    return isPending.value.patch > 0
+    return isPending.value.patch > 0 || Object.keys(patchPendingById.value).length > 0
   })
 
   const isRemovePending = computed(() => {
-    return isPending.value.remove > 0
+    return isPending.value.remove > 0 || Object.keys(removePendingById.value).length > 0
   })
 
   function setPending(method: 'find' | 'count' | 'get' | 'create' | 'update' | 'patch' | 'remove', value: boolean) {
@@ -61,10 +61,10 @@ export const useServicePending = () => {
 
     let place
 
-    if (method === 'create') place = createPending.value
-    else if (method === 'update') place = updatePending.value
-    else if (method === 'patch') place = patchPending.value
-    else if (method === 'remove') place = removePending.value
+    if (method === 'create') place = createPendingById.value
+    else if (method === 'update') place = updatePendingById.value
+    else if (method === 'patch') place = patchPendingById.value
+    else if (method === 'remove') place = removePendingById.value
 
     if (val) {
       set(place, id, true)
@@ -76,28 +76,28 @@ export const useServicePending = () => {
   function unsetPendingById(...ids: NullableId[]) {
     ids.forEach((id) => {
       if (id == null) return
-      del(createPending.value, id)
-      del(updatePending.value, id)
-      del(patchPending.value, id)
-      del(removePending.value, id)
+      del(createPendingById.value, id)
+      del(updatePendingById.value, id)
+      del(patchPendingById.value, id)
+      del(removePendingById.value, id)
     })
   }
 
   function clearAll() {
     isPending.value = defaultPending()
 
-    createPending.value = {}
-    updatePending.value = {}
-    patchPending.value = {}
-    removePending.value = {}
+    createPendingById.value = {}
+    updatePendingById.value = {}
+    patchPendingById.value = {}
+    removePendingById.value = {}
   }
 
   return {
     isPending,
-    createPending,
-    updatePending,
-    patchPending,
-    removePending,
+    createPendingById,
+    updatePendingById,
+    patchPendingById,
+    removePendingById,
     isFindPending,
     isCountPending,
     isGetPending,

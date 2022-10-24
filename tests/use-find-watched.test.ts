@@ -10,7 +10,7 @@ function createTestContext() {
 
   class Message extends BaseModel {
     static modelName = 'Message'
-    messageTo: string
+    // messageTo: string
   }
 
   const servicePath = 'messages'

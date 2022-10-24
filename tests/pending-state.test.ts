@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 import { BaseModel, RequestTypeById, useService, defineServiceStore } from '../src'
-import { vi } from 'vitest'
+import { expect, vi } from 'vitest'
 
 const pinia = createPinia()
 
@@ -114,7 +114,7 @@ describe('Pending State', () => {
     afterEach(() => reset())
 
     test('pending state for model.create', async () => {
-      const createState = computed(() => messagesService.createPending[1])
+      const createState = computed(() => messagesService.createPendingById[1])
       const handler = vi.fn()
       watch(() => createState.value, handler, { immediate: true })
 
@@ -131,7 +131,7 @@ describe('Pending State', () => {
     test('pending state for model.patch', async () => {
       const message = computed(() => messagesService.itemsById[0])
 
-      const patchState = computed(() => messagesService.isPatchPending[0])
+      const patchState = computed(() => messagesService.patchPendingById[0])
       const handler = vi.fn()
       watch(() => patchState.value, handler, { immediate: true })
 
@@ -143,11 +143,11 @@ describe('Pending State', () => {
 
       expect(handler.mock.calls[0][0]).toBeUndefined()
       expect(handler.mock.calls[1][0]).toBe(true)
-      expect(handler.mock.calls[2][0]).toBe(false)
+      expect(handler.mock.calls[2][0]).toBeUndefined()
     })
 
     test('pending state for model.update', async () => {
-      const updateState = computed(() => messagesService.isUpdatePending[0])
+      const updateState = computed(() => messagesService.updatePendingById[0])
       const handler = vi.fn()
       watch(() => updateState.value, handler, { immediate: true })
 
@@ -157,11 +157,11 @@ describe('Pending State', () => {
 
       expect(handler.mock.calls[0][0]).toBeUndefined()
       expect(handler.mock.calls[1][0]).toBe(true)
-      expect(handler.mock.calls[2][0]).toBe(false)
+      expect(handler.mock.calls[2][0]).toBeUndefined()
     })
 
     test('pending state for model.remove', async () => {
-      const removeState = computed(() => messagesService.isRemovePending[0])
+      const removeState = computed(() => messagesService.removePendingById[0])
       const handler = vi.fn()
       watch(() => removeState.value, handler, { immediate: true })
 
@@ -186,7 +186,7 @@ describe('Pending State', () => {
       ['isRemovePending', 'remove'],
     ])('add(%i, %i) -> %i', (title, method) => {
       messagesService.setPendingById('foo', method as RequestTypeById, true)
-      expect(messagesService[title]).toBeTruthy()
+      expect(messagesService[title]).toBe(true)
       messagesService.setPendingById('foo', method as RequestTypeById, false)
       expect(messagesService[title]).toBeFalsy()
     })

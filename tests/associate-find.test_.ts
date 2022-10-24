@@ -5,9 +5,8 @@ import { api } from './feathers'
 import { resetStores } from './test-utils'
 
 export class User extends BaseModel {
-  name: string
-
-  messages?: Partial<Message>[]
+  // name: string
+  // messages?: Partial<Message>[]
 }
 
 export class Message extends BaseModel {

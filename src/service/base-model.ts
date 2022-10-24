@@ -86,31 +86,36 @@ export class BaseModel implements AnyData {
     const { idField } = this.getModel()
     const store = this.getStore()
     const id = getId(this, idField)
-    return store.createPending[id] || store.updatePending[id] || store.patchPending[id] || false
+    if (id == null) return false
+    return store.createPendingById[id] || store.updatePendingById[id] || store.patchPendingById[id] || false
   }
   get isCreatePending(): boolean {
     const { idField } = this.getModel()
     const store = this.getStore()
     const id = getId(this, idField)
-    return !!id && (store.createPending[id] || false)
+    if (id == null) return false
+    return store.createPendingById[id] || false
   }
   get isPatchPending(): boolean {
     const { idField } = this.getModel()
     const store = this.getStore()
     const id = getId(this, idField)
-    return !!id && (store.patchPending[id] || false)
+    if (id == null) return false
+    return store.patchPendingById[id] || false
   }
   get isUpdatePending(): boolean {
     const { idField } = this.getModel()
     const store = this.getStore()
     const id = getId(this, idField)
-    return !!id && (store.updatePending[id] || false)
+    if (id == null) return false
+    return store.updatePendingById[id] || false
   }
   get isRemovePending(): boolean {
     const { idField } = this.getModel()
     const store = this.getStore()
     const id = getId(this, idField)
-    return !!id && (store.removePending[id] || false)
+    if (id == null) return false
+    return store.removePendingById[id] || false
   }
 
   get isPending(): boolean {

@@ -253,6 +253,10 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     setPending: _setPending,
     setPendingById,
     unsetPendingById: _unsetPendingById,
+    createPendingById,
+    patchPendingById,
+    removePendingById,
+    updatePendingById,
   } = useServicePending()
 
   const { pagination, updatePaginationForQuery } = useServicePagination({
@@ -633,6 +637,10 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     isPatchPending,
     isRemovePending,
     setPendingById,
+    createPendingById,
+    updatePendingById,
+    patchPendingById,
+    removePendingById,
     // service actions
     find,
     count,
