@@ -45,6 +45,9 @@
     "sift": "^16.0.0",
     "vue-demi": "latest"
   },
+  "optionalDependencies": {
+    "@feathersjs/rest-client": "5.0.0-pre.28"
+  },
   "devDependencies": {
     "@feathersjs/authentication-client": "5.0.0-pre.28",
     "@feathersjs/authentication-jwt": "^2.0.10",
