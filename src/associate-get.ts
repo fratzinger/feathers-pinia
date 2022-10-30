@@ -1,21 +1,25 @@
-import type { FindClassParams, ModelStatic } from './service-store/types'
+import type { FindClassParams, ModelConstructor } from './service/types'
 import type { HandleSetInstance } from './associate-utils'
 import type { Params } from './types'
 import type { Id } from '@feathersjs/feathers'
-import { BaseModel } from './service-store/base-model'
 import { getParams, setupAssociation } from './associate-utils'
+import { BaseModel } from './service'
 
-interface AssociateGetOptions<M extends BaseModel> {
-  Model: ModelStatic<BaseModel>
-  getId: (instance: M) => Id | null
-  makeParams?: (instance: M) => FindClassParams
-  handleSetInstance?: HandleSetInstance<M>
+interface AssociateGetOptions<
+  M1 extends BaseModel,
+  C extends ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+> {
+  Model: C
+  getId: (instance: M1) => Id | null
+  makeParams?: (instance: M1) => FindClassParams
+  handleSetInstance?: HandleSetInstance<M1, M>
   propUtilsPrefix?: string
 }
-export function associateGet<M extends BaseModel>(
+export function associateGet<C extends ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(
   instance: M,
   prop: string,
-  { Model, getId, makeParams, handleSetInstance, propUtilsPrefix = '_' }: AssociateGetOptions<M>,
+  { Model, getId, makeParams, handleSetInstance, propUtilsPrefix = '_' }: AssociateGetOptions<C>,
 ) {
   // Cache the initial data in a variable
   const initialData = (instance as any)[prop]
@@ -37,7 +41,7 @@ export function associateGet<M extends BaseModel>(
     getFromStore(id?: Id | null, params?: Params) {
       const _id = instance.getId() || id
       const _params = getParams(instance, Model.store as any, makeParams) || params
-      return Model.getFromStore(_id, _params)
+      return Model.getFromStore(_id as Id | null, _params)
     },
   }
 
@@ -63,7 +67,7 @@ export function associateGet<M extends BaseModel>(
   })
 
   // Create the `_propName` utility object
-  Object.defineProperty(instance.Model.prototype, propUtilName, {
+  Object.defineProperty(instance.getModel().prototype, propUtilName, {
     configurable: true,
     enumerable: false,
     value: utils,

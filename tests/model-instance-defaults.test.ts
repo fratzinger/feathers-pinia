@@ -1,16 +1,14 @@
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { BaseModel, useService, defineServiceStore } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
-
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
 
 class Message extends BaseModel {
   // This doesn't work as a default value.
   // It will overwrite all passed-in values and always be this value.
   text = 'The text in the model always wins. You can only overwrite it after instantiation'
-  otherText: string
+  // otherText: string
 
   static instanceDefaults() {
     return {
@@ -21,7 +19,7 @@ class Message extends BaseModel {
 }
 
 const servicePath = 'messages'
-const useMessagesService = defineStore({ servicePath, Model: Message })
+const useMessagesService = defineServiceStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
 
 const messagesService = useMessagesService(pinia)
 
@@ -37,9 +35,7 @@ describe('Model Instance Defaults', () => {
     const message = await messagesService.create({
       text: 'this text will be overwritten by the value in the Message class.',
     })
-    expect(message.text).toBe(
-      'The text in the model always wins. You can only overwrite it after instantiation',
-    )
+    expect(message.text).toBe('The text in the model always wins. You can only overwrite it after instantiation')
   })
 
   test('use instanceDefaults for default values', async () => {

@@ -1,15 +1,12 @@
 import { vi } from 'vitest'
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
+import { BaseModel, useService, defineServiceStore } from '../src'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
 class Message extends BaseModel {
-  id: string
   text = ''
   other = ''
   userId: null | number = null
@@ -21,7 +18,9 @@ class Message extends BaseModel {
   }
 }
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messageStore = useMessagesService(pinia)
 
 const reset = () => resetStores(api.service('messages'), messageStore)

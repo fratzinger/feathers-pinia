@@ -1,16 +1,16 @@
 import { syncWithStorage } from '../src/storage-sync'
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
 import { vi } from 'vitest'
+import { BaseModel, useService, defineServiceStore } from '../src'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
 class Message extends BaseModel {}
-const useMessagesService = defineStore<'', Message>({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messagesService = useMessagesService(pinia)
 const localStorageMock: Storage = {
   getItem: vi.fn(),
@@ -35,7 +35,7 @@ describe('Storage Sync', () => {
     await timeout(600)
     expect(localStorageMock.setItem).toHaveBeenCalled()
     const [key, value] = (localStorageMock.setItem as any).mock.calls[0]
-    expect(key).toBe('service.messages')
+    expect(key).toBe('messages')
     const val = JSON.parse(value)
     expect(val.tempsById[msg[tempIdField]]).toBeTruthy()
   })
@@ -45,7 +45,7 @@ describe('Storage Sync', () => {
     await timeout(1000)
     expect(localStorageMock.getItem).toHaveBeenCalled()
     const [key, value] = (localStorageMock.getItem as any).mock.calls[0]
-    expect(key).toBe('service.messages')
+    expect(key).toBe('messages')
     expect(value).toBeUndefined()
   })
 })

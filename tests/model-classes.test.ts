@@ -1,15 +1,13 @@
 import { createPinia } from 'pinia'
-import { setupFeathersPinia, models } from '../src/index'
+import { BaseModel, useService, defineServiceStore } from '../src/index'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
 class Message extends BaseModel {}
 
 const servicePath = 'messages'
-const useMessagesService = defineStore({ servicePath, Model: Message })
+const useMessagesService = defineServiceStore('messages', () => useService({ servicePath, Model: Message, app: api }))
 
 const messagesService = useMessagesService(pinia)
 
@@ -26,11 +24,6 @@ describe('Model Class', () => {
       text: 'Quick, what is the number to 911?',
     })
     expect(message.constructor.name).toBe('Message')
-  })
-
-  test('registering a model adds it to the models object', () => {
-    expect(models).toHaveProperty('api')
-    expect(models.api).toHaveProperty('Message')
   })
 
   test('Model class is available on the store as a getter', () => {

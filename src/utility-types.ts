@@ -1,17 +1,11 @@
-import { StateTree, _GettersTree, _StoreWithGetters, _StoreWithState } from 'pinia'
-import { Ref, UnwrapRef } from 'vue-demi'
+import { Ref } from 'vue-demi'
+import { Paginated } from './types'
 
 export type MaybeRef<T> = T | Ref<T>
 export type MaybeArray<T> = T | T[]
 
-export type TypedGetters<S, G, DefaultS extends StateTree = {}, DefaultG = {}> = G &
-  ThisType<UnwrapRef<DefaultS & S> & _StoreWithGetters<DefaultG & G> /* & PiniaCustomProperties*/> &
-  _GettersTree<DefaultS & S>
+export type ArrayOrPaginated<T> = T[] | Paginated<T>
 
-export type TypedActions<S, G, A, DefaultS extends StateTree = {}, DefaultG = {}, DefaultA = {}> = A &
-  ThisType<
-    A &
-      UnwrapRef<DefaultS & S> &
-      _StoreWithState<any, DefaultS & S, DefaultG & G, DefaultA & A> &
-      _StoreWithGetters<DefaultG & G> /* & PiniaCustomProperties*/
-  >
+export type NonConstructorKeys<T> = { [P in keyof T]: T[P] extends new () => any ? never : P }[keyof T]
+export type NonConstructor<T> = Pick<T, NonConstructorKeys<T>>
+export type Constructor<T = any, A extends unknown[] = any[]> = new (...arguments_: A) => T

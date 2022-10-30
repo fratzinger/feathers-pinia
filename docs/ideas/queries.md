@@ -30,7 +30,7 @@ export class User extends BaseModel {
     super(user, options)
     this.init(user)
 
-    const { store, models } = this.Model
+    const { store, models } = this.getModel()
 
     associateFind(user, 'messages', {
       Model: models.api.Message,
@@ -58,7 +58,7 @@ export class Message extends BaseModel {
     super(message, options)
     this.init(message)
 
-    const { store, models } = this.Model
+    const { store, models } = this.getModel()
 
     associateGet(message, 'user', {
       Model: models.api.User,

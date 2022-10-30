@@ -1,14 +1,14 @@
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { useService, defineServiceStore } from '../src'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 
 const pinia = createPinia()
 
-const { defineStore } = setupFeathersPinia({ clients: { api } })
-
-const useMessagesService = defineStore({ servicePath: 'messages' })
-const useTodosService = defineStore({ servicePath: 'todos', tempIdField: '__customTempId' })
+const useMessagesService = defineServiceStore('messages', () => useService({ servicePath: 'messages', app: api }))
+const useTodosService = defineServiceStore('todos', () =>
+  useService({ servicePath: 'todos', tempIdField: '__customTempId', app: api }),
+)
 
 const messagesService = useMessagesService(pinia)
 const todosService = useTodosService(pinia)

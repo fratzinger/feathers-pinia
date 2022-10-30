@@ -1,21 +1,18 @@
 import { watch, computed } from 'vue-demi'
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
-import { RequestTypeById } from '../src/service-store/types'
-import { vi } from 'vitest'
+import { BaseModel, RequestTypeById, useService, defineServiceStore } from '../src'
+import { expect, vi } from 'vitest'
 
 const pinia = createPinia()
-
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
 
 class Message extends BaseModel {
   static modelName = 'Message'
 }
 
 const servicePath = 'messages'
-const useMessagesService = defineStore({ servicePath, Model: Message })
+const useMessagesService = defineServiceStore(servicePath, () => useService({ servicePath, Model: Message, app: api }))
 
 const messagesService = useMessagesService(pinia)
 
@@ -32,7 +29,7 @@ describe('Pending State', () => {
     test('pending state for find success', async () => {
       // setup the watcher with a mock function
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.find, handler)
+      watch(() => messagesService.isFindPending, handler)
 
       // Trigger the watcher with a request.
       await messagesService.find({ query: {} })
@@ -45,7 +42,7 @@ describe('Pending State', () => {
 
     test('pending state for find error', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.find, handler)
+      watch(() => messagesService.isFindPending, handler)
 
       try {
         // Feathers will throw because of $custom
@@ -59,7 +56,7 @@ describe('Pending State', () => {
     test('pending state for count success', async () => {
       // setup the watcher with a mock function
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.count, handler)
+      watch(() => messagesService.isCountPending, handler)
 
       // Trigger the watcher with a request.
       await messagesService.count({ query: {} })
@@ -72,7 +69,7 @@ describe('Pending State', () => {
 
     test('pending state for count error', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.count, handler)
+      watch(() => messagesService.isCountPending, handler)
 
       try {
         // Feathers will throw because of $custom
@@ -85,7 +82,7 @@ describe('Pending State', () => {
 
     test('pending state for get success', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.get, handler)
+      watch(() => messagesService.isGetPending, handler)
 
       await messagesService.get(0)
 
@@ -95,7 +92,7 @@ describe('Pending State', () => {
 
     test('pending state for get error', async () => {
       const handler = vi.fn()
-      watch(() => messagesService.pendingById.Model.get, handler)
+      watch(() => messagesService.isGetPending, handler)
 
       try {
         // Feathers will throw because there's no record with id: 1
@@ -117,7 +114,7 @@ describe('Pending State', () => {
     afterEach(() => reset())
 
     test('pending state for model.create', async () => {
-      const createState = computed(() => messagesService.pendingById[1]?.create)
+      const createState = computed(() => messagesService.createPendingById[1])
       const handler = vi.fn()
       watch(() => createState.value, handler, { immediate: true })
 
@@ -134,7 +131,7 @@ describe('Pending State', () => {
     test('pending state for model.patch', async () => {
       const message = computed(() => messagesService.itemsById[0])
 
-      const patchState = computed(() => messagesService.pendingById[0]?.patch)
+      const patchState = computed(() => messagesService.patchPendingById[0])
       const handler = vi.fn()
       watch(() => patchState.value, handler, { immediate: true })
 
@@ -146,11 +143,11 @@ describe('Pending State', () => {
 
       expect(handler.mock.calls[0][0]).toBeUndefined()
       expect(handler.mock.calls[1][0]).toBe(true)
-      expect(handler.mock.calls[2][0]).toBe(false)
+      expect(handler.mock.calls[2][0]).toBeUndefined()
     })
 
     test('pending state for model.update', async () => {
-      const updateState = computed(() => messagesService.pendingById[0]?.update)
+      const updateState = computed(() => messagesService.updatePendingById[0])
       const handler = vi.fn()
       watch(() => updateState.value, handler, { immediate: true })
 
@@ -160,11 +157,11 @@ describe('Pending State', () => {
 
       expect(handler.mock.calls[0][0]).toBeUndefined()
       expect(handler.mock.calls[1][0]).toBe(true)
-      expect(handler.mock.calls[2][0]).toBe(false)
+      expect(handler.mock.calls[2][0]).toBeUndefined()
     })
 
     test('pending state for model.remove', async () => {
-      const removeState = computed(() => messagesService.pendingById[0]?.remove)
+      const removeState = computed(() => messagesService.removePendingById[0])
       const handler = vi.fn()
       watch(() => removeState.value, handler, { immediate: true })
 
@@ -189,7 +186,7 @@ describe('Pending State', () => {
       ['isRemovePending', 'remove'],
     ])('add(%i, %i) -> %i', (title, method) => {
       messagesService.setPendingById('foo', method as RequestTypeById, true)
-      expect(messagesService[title]).toBeTruthy()
+      expect(messagesService[title]).toBe(true)
       messagesService.setPendingById('foo', method as RequestTypeById, false)
       expect(messagesService[title]).toBeFalsy()
     })

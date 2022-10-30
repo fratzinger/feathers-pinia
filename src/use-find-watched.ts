@@ -1,11 +1,13 @@
-import type { UseFindComputed, UseFindWatchedOptionsStandalone, UseFindState } from './service-store/types'
+import type { UseFindComputed, UseFindWatchedOptionsStandalone, UseFindState, ModelConstructor } from './service/types'
 import type { Params, Paginated } from './types'
 import { computed, reactive, Ref, unref, toRefs, watch } from 'vue-demi'
 import debounce from 'just-debounce'
 import { getQueryInfo, makeUseFindItems } from './utils'
-import { BaseModel } from './service-store'
 
-export function useFindWatched<M extends BaseModel = BaseModel>({
+export function useFindWatched<
+  C extends ModelConstructor = ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+>({
   model,
   params = computed(() => null),
   fetchParams = computed(() => undefined),
@@ -13,7 +15,7 @@ export function useFindWatched<M extends BaseModel = BaseModel>({
   queryWhen = computed(() => true),
   local = false,
   immediate = true,
-}: UseFindWatchedOptionsStandalone<M>) {
+}: UseFindWatchedOptionsStandalone<C>) {
   if (!model) {
     throw new Error(`No model provided for useFind(). Did you define and register it with FeathersPinia?`)
   }
@@ -93,7 +95,7 @@ export function useFindWatched<M extends BaseModel = BaseModel>({
     state.isPending = true
     state.haveBeenRequested = true
 
-    const request = model.find(params).then((response: any) => {
+    const request = model.store.find(params).then((response: any) => {
       // To prevent thrashing, only clear error on response, not on initial request.
       state.error = null
       state.haveLoaded = true

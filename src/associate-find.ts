@@ -1,19 +1,27 @@
-import type { FindClassParams, FindClassParamsStandalone, AssociateFindUtils, ModelStatic } from './service-store/types'
-import { BaseModel } from './service-store/base-model'
-import { getParams, setupAssociation } from './associate-utils'
+import type { FindClassParams, FindClassParamsStandalone, AssociateFindUtils, ModelConstructor } from './service/types'
+import { getParams, HandleSetInstance, setupAssociation } from './associate-utils'
 import { Find, useFind } from './use-find'
 import { MaybeRef } from './utility-types'
+import { BaseModel } from './service'
 
-interface AssociateFindOptions<M extends BaseModel> {
-  Model: ModelStatic<BaseModel>
-  makeParams: (instance: M) => FindClassParams
-  handleSetInstance?: (this: M, associatedRecord: M) => void
+interface AssociateFindOptions<
+  M1 extends BaseModel,
+  C extends ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+> {
+  Model: C
+  makeParams: (instance: M1) => FindClassParams
+  handleSetInstance?: HandleSetInstance<M1, M>
   propUtilsPrefix?: string
 }
-export function associateFind<M extends BaseModel>(
-  instance: M,
+export function associateFind<
+  M1 extends BaseModel,
+  C extends ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+>(
+  instance: M1,
   prop: string,
-  { Model, makeParams, handleSetInstance, propUtilsPrefix = '_' }: AssociateFindOptions<M>,
+  { Model, makeParams, handleSetInstance, propUtilsPrefix = '_' }: AssociateFindOptions<M1, C, M>,
 ) {
   // cache the initial data in a variable
   const initialData = (instance as any)[prop]
@@ -26,14 +34,14 @@ export function associateFind<M extends BaseModel>(
   )
 
   // define `setupFind` for lazy creation of associated getters.
-  let _utils: AssociateFindUtils<M>
+  let _utils: AssociateFindUtils<C>
   function setupFind(instance: M) {
     if (!makeParams) return null
     const _params = getParams(instance, Model.store as any, makeParams)
-    _utils = new Find(_params as FindClassParamsStandalone<M>) as any
-    _utils.useFind = (params: MaybeRef<FindClassParams>): Find<M> => {
+    _utils = new Find(_params as FindClassParamsStandalone<C>) as any
+    _utils.useFind = (params: MaybeRef<FindClassParams>): Find<C> => {
       (params.value || params).store = Model.store
-      return useFind(params as MaybeRef<FindClassParamsStandalone<M>>)
+      return useFind(params as MaybeRef<FindClassParamsStandalone<C, M>>)
     }
   }
 

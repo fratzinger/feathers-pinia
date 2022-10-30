@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Ref } from 'vue-demi'
 import type { Id } from '@feathersjs/feathers/lib'
-import { setupFeathersPinia, BaseModel, associateGet, type Params } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, associateGet, type Params, useService, defineServiceStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
@@ -34,10 +34,8 @@ export class Message extends BaseModel {
   }
 
   static setupInstance(message: Message) {
-    const { store, models } = this
-
     associateGet(message, 'user', {
-      Model: models.api.User,
+      Model: User,
       getId(message) {
         return message.userId as number
       },
@@ -56,12 +54,13 @@ export class Message extends BaseModel {
 }
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
-const useUsersService = defineStore({ servicePath: 'users', Model: User })
+const useUsersService = defineServiceStore('users', () => useService({ servicePath: 'users', Model: User, app: api }))
 const userStore = useUsersService(pinia)
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messageStore = useMessagesService(pinia)
 
 const reset = () => {
@@ -86,18 +85,18 @@ afterAll(() => reset())
 describe('Populated Data', () => {
   //
   test('values added by associatedGet default to null when no related data is present', async () => {
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     expect(message.user).toBe(null)
   })
 
   test('a bogus id will still return null (no local data to populate)', async () => {
-    const message = new Message({ userId: 1 }).addToStore() as Message
+    const message = new Message({ userId: 1 }).addToStore()
     expect(message.user).toBe(null)
   })
 
   test("pre-populated data gets added to the associated Model's store", async () => {
     const user = { id: 1, name: 'Marshall' }
-    const message = new Message({ userId: 1, user }).addToStore() as Message
+    const message = new Message({ userId: 1, user }).addToStore()
     const populatedUser = JSON.parse(JSON.stringify(message.user))
     expect(populatedUser).toEqual(user)
   })
@@ -106,35 +105,35 @@ describe('Populated Data', () => {
 describe('AssociateGet Utils', () => {
   //
   test('utils are added at underscored prop, like `_user`', async () => {
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     expect(message._user).toBeDefined()
   })
 
   test('utils include a `get` method', () => {
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     expect(typeof message._user.get).toBe('function')
   })
 
   test('utils include a `findInStore` method', () => {
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     expect(typeof message._user.getFromStore).toBe('function')
   })
 })
 
 describe('Fetching Associated Data', () => {
   test('instances have a "getItem" method based on the prop name', async () => {
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     expect(typeof message._user.get).toBe('function')
   })
 
   test('can get associated data directly from the instance', async () => {
-    const message = new Message({ userId: 4 }).addToStore() as Message
+    const message = new Message({ userId: 4 }).addToStore()
     const result = await message._user.get()
     expect(result.id).toBe(4)
   })
 
   test('throws 404 if not found', async () => {
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     try {
       await message._user.get()
     } catch (error: any) {
@@ -146,7 +145,7 @@ describe('Fetching Associated Data', () => {
 describe('Writing to the Association Attribute', () => {
   test('writing a record to the association triggers the handleSetInstance callback', async () => {
     const user = { id: 1, name: 'Marshall' }
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     message.user = user
     expect(message.handleSetInstanceRan).toBeTruthy()
     expect(message.userId).toBe(1)
@@ -154,14 +153,14 @@ describe('Writing to the Association Attribute', () => {
 
   test('after passing through handleSetInstance, the data can be retrieved from the store.', async () => {
     const user = { id: 1, name: 'Marshall' }
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     message.user = user
     expect(message.user).toEqual(user)
   })
 
   test('associations also work for records temp records', async () => {
     const user = { name: 'Marshall' }
-    const message = new Message({}).addToStore() as Message
+    const message = new Message({}).addToStore()
     // Write data without an id to the `user` setter
     message.user = user
     const tempId = (message.user as User).getAnyId()
@@ -173,7 +172,7 @@ describe('Writing to the Association Attribute', () => {
 describe('Saving Instance', () => {
   test('assocations are not included during save', async () => {
     let hadAssociatedData = false
-    const message = new Message({ userId: 4 }).addToStore() as Message
+    const message = new Message({ userId: 4 }).addToStore()
     // Populate the user and make sure it shows up through the getter.
     await message._user.get()
     expect(message.user.id).toBe(4)
@@ -189,7 +188,7 @@ describe('Saving Instance', () => {
   })
 
   test('assocated data must be manually saved', async () => {
-    const message = new Message({ userId: 5 }).addToStore() as Message
+    const message = new Message({ userId: 5 }).addToStore()
     await message._user.get()
     const result = await (message.user as User)?.save()
     expect(result.id).toBe(5)
@@ -198,14 +197,14 @@ describe('Saving Instance', () => {
 
 describe('Cloning Associations', () => {
   test('associated data is still present after clone', async () => {
-    const message = new Message({ userId: 6 }).addToStore() as Message
+    const message = new Message({ userId: 6 }).addToStore()
     await message._user.get()
     const clone = message.clone()
     expect(message.user).toEqual(clone.user)
   })
 
   test('associated data is still present after clone/commit', async () => {
-    const message = new Message({ userId: 4 }).addToStore() as Message
+    const message = new Message({ userId: 4 }).addToStore()
     await message._user.get()
     const clone = message.clone()
     const original = clone.commit()
@@ -213,7 +212,7 @@ describe('Cloning Associations', () => {
   })
 
   test('associated data is still present after clone/re-clone/reset', async () => {
-    const message = new Message({ userId: 4 }).addToStore() as Message
+    const message = new Message({ userId: 4 }).addToStore()
     await message._user.get()
 
     const clone = message.clone()

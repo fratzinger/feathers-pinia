@@ -1,8 +1,5 @@
 import type { ComputedRef, Ref, UnwrapRef } from 'vue-demi'
-import { DefineStoreOptionsBase, StateTree, Store } from 'pinia'
-import { AnyData, ModelStatic } from './service-store/types'
-import { BaseModel } from './service-store/base-model'
-import { TypedActions, TypedGetters } from './utility-types'
+import { AnyData, ModelConstructor } from './service/types'
 
 export interface Filters {
   $sort?: { [prop: string]: -1 | 1 }
@@ -60,28 +57,11 @@ export interface QueryInfo {
   isOutdated: boolean | undefined
 }
 
-export type HandledEvents = 'created' | 'patched' | 'updated' | 'removed'
-export type HandleEventsFunction<M extends BaseModel = BaseModel> = (
-  item: any,
-  ctx: { model: ModelStatic<M>; models: any },
-) => any
+export type HandledEvent = 'created' | 'patched' | 'updated' | 'removed'
+export type HandleEventsFunction<C extends ModelConstructor = ModelConstructor> = (item: any, ctx: { model: C }) => any
 
-export type HandleEvents<M extends BaseModel = BaseModel> = {
-  [event in HandledEvents]: HandleEventsFunction<M>
-}
-
-export interface DefineStoreOptionsWithDefaults<
-  Id extends string,
-  S extends StateTree,
-  G /* extends GettersTree<S> */,
-  A /* extends Record<string, StoreAction> */,
-  DefaultS extends StateTree,
-  DefaultG,
-  DefaultA,
-> extends DefineStoreOptionsBase<S, Store<Id, S, G, A>> {
-  state?: () => S
-
-  getters?: TypedGetters<S, G, DefaultS, DefaultG>
-
-  actions?: TypedActions<S, G, A, DefaultS, DefaultG, DefaultA>
-}
+export type HandleEvents<C extends ModelConstructor = ModelConstructor> =
+  | {
+      [event in HandledEvent]: HandleEventsFunction<C> | false
+    }
+  | false

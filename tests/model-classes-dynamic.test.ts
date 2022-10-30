@@ -1,13 +1,11 @@
 import { createPinia } from 'pinia'
-import { setupFeathersPinia, models } from '../src/index'
+import { useService, defineServiceStore } from '../src/index'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
-const { defineStore } = setupFeathersPinia({ clients: { api } })
-
 const servicePath = 'messages'
-const useMessagesService = defineStore({ servicePath })
+const useMessagesService = defineServiceStore('messages', () => useService({ servicePath, app: api }))
 
 const messagesService = useMessagesService(pinia)
 
@@ -23,11 +21,6 @@ describe('DynamicBaseModel', () => {
       text: 'Quick, what is the number to 911?',
     })
     expect((message.constructor as any).dynamicBaseModel).toBeTruthy()
-  })
-
-  test('registering a model adds it to the models object', () => {
-    expect(models).toHaveProperty('api')
-    expect(models.api).toHaveProperty('messages')
   })
 
   test('create local instance', () => {

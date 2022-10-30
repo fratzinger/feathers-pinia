@@ -1,29 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Params } from '@feathersjs/feathers/lib'
-import type { ComputedRef, Ref } from 'vue-demi'
-import { setupFeathersPinia, BaseModel, associateFind, AssociateFindUtils } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, associateFind, AssociateFindUtils, useService, defineServiceStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 
 export class User extends BaseModel {
-  id: number
-  name: string
-
-  messages?: Partial<Message>[]
+  // name: string
+  // messages?: Partial<Message>[]
 }
 
 export class Message extends BaseModel {
-  id: number
-  text: string
-  userId: null | number
-  stargazerIds: number[]
-  createdAt: Date | null
   handleSetInstanceRan: boolean
 
   // Properties added by associateFind
   stargazers: Partial<User>[]
-  _stargazers: AssociateFindUtils<User>
+  _stargazers: AssociateFindUtils<typeof User>
 
   // findStargazers: any
 
@@ -42,10 +33,8 @@ export class Message extends BaseModel {
   }
 
   static setupInstance(message: Message) {
-    const { store, models } = this
-
     associateFind(message, 'stargazers', {
-      Model: models.api.User,
+      Model: User,
       makeParams: (message) => ({
         query: { $or: [{ id: { $in: message.stargazerIds } }, { _tempId: { $in: message.stargazerIds } }] },
       }),
@@ -61,12 +50,13 @@ export class Message extends BaseModel {
 }
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
-const useUsersService = defineStore({ servicePath: 'users', Model: User })
+const useUsersService = defineServiceStore('users', () => useService({ servicePath: 'users', Model: User, app: api }))
 const userStore = useUsersService(pinia)
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messageStore = useMessagesService(pinia)
 
 const reset = () => {

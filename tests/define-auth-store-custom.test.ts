@@ -1,32 +1,45 @@
-import { createPinia } from 'pinia'
+import { createPinia, defineStore } from 'pinia'
 import { vi } from 'vitest'
-import { defineAuthStore } from '../src/index'
 import { api } from './feathers'
+import { ref, computed } from 'vue-demi'
+import { useAuth } from '../src'
 
 const pinia = createPinia()
 const handleResponse = vi.fn()
 const handleError = vi.fn()
 
-const useAuth = defineAuthStore({
-  id: 'my-auth',
-  feathersClient: api,
-  state: () => ({
-    test: true,
-  }),
-  getters: {
-    foo() {
-      return 'bar'
-    },
-  },
-  actions: {
-    toggleTest() {
-      this.test = false
-    },
-    handleResponse,
-    handleError,
-  },
+const useAuthStore = defineStore('my-auth', () => {
+  const auth = useAuth({ app: api })
+
+  const test = ref(true)
+
+  const foo = computed(() => 'bar')
+
+  function toggleTest() {
+    test.value = false
+  }
+
+  async function authenticate(authData: any) {
+    try {
+      const response = await auth.authenticate(authData)
+      handleResponse(response)
+      return response
+    } catch (err: any) {
+      handleError(err)
+      return await Promise.reject(err)
+    }
+  }
+
+  return {
+    ...auth,
+    test,
+    foo,
+    toggleTest,
+    authenticate,
+  }
 })
-const store = useAuth(pinia)
+
+const store = useAuthStore(pinia)
 
 describe('Custom Auth Store functionality', () => {
   beforeEach(() => {

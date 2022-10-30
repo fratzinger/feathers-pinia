@@ -1,14 +1,15 @@
 import type { Params, Paginated, QueryInfo, DiffDefinition } from './types'
 import type { MaybeRef } from './utility-types'
-import type { AnyData, AnyDataOrArray, BaseModelAssociations, FindClassParams } from './service-store/types'
+import type { AnyData, AnyDataOrArray, BaseModelAssociations, FindClassParams } from './service/types'
 import { _ } from '@feathersjs/commons'
 import stringify from 'fast-json-stable-stringify'
 import ObjectID from 'isomorphic-mongo-objectid'
 import fastCopy from 'fast-copy'
 import { computed, Ref, unref } from 'vue-demi'
 import isEqual from 'fast-deep-equal'
+import { Id } from '@feathersjs/feathers'
 
-function stringifyIfObject(val: any): string | any {
+function stringifyIfObject<T>(val: T): string | T {
   if (typeof val === 'object' && val != null) {
     return val.toString()
   }
@@ -23,25 +24,26 @@ function stringifyIfObject(val: any): string | any {
  * @param item
  * @param idField
  */
-export function getId(item: any, idField: string) {
+export function getId(item: AnyData, idField: string): Id | undefined {
   if (!item) return
-  if (idField && item[idField] != undefined) {
-    return stringifyIfObject(item[idField as string])
+  if (idField in item) {
+    return stringifyIfObject(item[idField])
   }
-  if (item.id != undefined) {
-    return stringifyIfObject(item.id)
-  }
-  if (item._id != undefined) {
-    return stringifyIfObject(item._id)
-  }
+  // if (item.id != undefined) {
+  //   return stringifyIfObject(item.id)
+  // }
+  // if (item._id != undefined) {
+  //   return stringifyIfObject(item._id)
+  // }
 }
 export function getTempId(item: any, tempIdField: string) {
-  if (item?.[tempIdField] != undefined) {
+  if (tempIdField in item) {
     return stringifyIfObject(item[tempIdField])
   }
 }
 export function getAnyId(item: any, tempIdField: string, idField: string) {
-  return getId(item, idField) != undefined ? getId(item, idField) : getTempId(item, tempIdField)
+  const id = getId(item, idField)
+  return id != undefined ? id : getTempId(item, tempIdField)
 }
 
 export function getQueryInfo(params: Params = {}, response: Partial<Paginated<any>> = {}): QueryInfo {
@@ -85,7 +87,7 @@ export function getItemsFromQueryInfo(pagination: any, queryInfo: any, keyedById
  * @param state
  * @param item
  */
-export function assignTempId(item: any, tempIdField: string) {
+export function assignTempId(item: AnyData, tempIdField: string) {
   const newId = new ObjectID().toString()
   item[tempIdField] = newId
   return item
@@ -115,7 +117,9 @@ export function cleanData<T = AnyDataOrArray>(data: T, tempIdField: string): T {
  * @param data item(s) before being passed to the server
  * @param responseData items(s) returned from the server
  */
-export function restoreTempIds(data: AnyDataOrArray, resData: AnyDataOrArray, tempIdField: string) {
+export function restoreTempIds<T extends AnyData>(data: AnyData, resData: T, tempIdField: string): T
+export function restoreTempIds<T extends AnyData[]>(data: any, resData: T, tempIdField: string): T
+export function restoreTempIds<T extends AnyDataOrArray>(data: AnyDataOrArray, resData: T, tempIdField: string): T {
   const { items: sourceItems, isArray } = getArray(data)
   const { items: responseItems } = getArray(resData)
 
@@ -135,7 +139,7 @@ export function restoreTempIds(data: AnyDataOrArray, resData: AnyDataOrArray, te
  * it impossible to accidentally modify stored data due to js object in-memory references.
  * @param data item or array of items
  */
-export function useCleanData(data: any) {
+export function useCleanData<T>(data: T) {
   const { items, isArray } = getArray(data)
   const cleaned = items.map((item: any) => fastCopy(item))
 
@@ -152,20 +156,13 @@ export function getArray<T>(data: T | T[]) {
   return { items: isArray ? data : [data], isArray }
 }
 
-export const hasOwn = (obj: AnyData, prop: string) => Object.prototype.hasOwnProperty.call(obj, prop)
+export const hasOwn = (obj: AnyData, prop: PropertyKey) => Object.prototype.hasOwnProperty.call(obj, prop)
 
-export function getSaveParams(params?: MaybeRef<Params>): Params {
+export function getSaveParams(params?: Params) {
   if (!params) {
     return {}
   }
   return fastCopy(unref(params))
-}
-export function markAsClone<T>(item: T) {
-  Object.defineProperty(item, '__isClone', {
-    value: true,
-    enumerable: false,
-  })
-  return item
 }
 
 /**
@@ -182,7 +179,7 @@ export function copyAssociations<M>(src: M, dest: M, associations: BaseModelAsso
   })
 }
 
-export function pickDiff(obj: any, diffDef: DiffDefinition) {
+export function pickDiff(obj: AnyData, diffDef: DiffDefinition) {
   // If no diff definition was given, return the entire object.
   if (!diffDef) return obj
 
@@ -216,12 +213,12 @@ export function diff(original: AnyData, clone: AnyData, diffDef: DiffDefinition)
   return diff
 }
 
-export const setOnRef = (obj: any, key: string, val: number) => {
+export const setOnRef = (obj: MaybeRef<AnyData>, key: string, val: number) => {
   (obj.value || obj)[key] = val
 }
 export const computedAttr = (obj: any, key: string) =>
   computed({
-    set: (val) => setOnRef(obj, key, val),
+    set: (val: number) => setOnRef(obj, key, val),
     get: () => unref(obj)[key],
   })
 

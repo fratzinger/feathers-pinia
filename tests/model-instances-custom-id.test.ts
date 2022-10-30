@@ -1,22 +1,20 @@
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { BaseModel, useService, defineServiceStore } from '../src'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
-class AltId extends BaseModel {
-  _id: number
-}
-const useAltIds = defineStore({ servicePath: 'alt-ids', Model: AltId, idField: '_id' })
+class AltId extends BaseModel {}
+const useAltIds = defineServiceStore('alt-ids', () =>
+  useService({ servicePath: 'alt-ids', Model: AltId, idField: '_id', app: api }),
+)
 const altIdStore = useAltIds(pinia)
 
-class CustomId extends BaseModel {
-  'my-id': number
-}
-const useCustomIds = defineStore({ servicePath: 'custom-ids', Model: CustomId, idField: 'my-id' })
+class CustomId extends BaseModel {}
+const useCustomIds = defineServiceStore('custom-ids', () =>
+  useService({ servicePath: 'custom-ids', Model: CustomId, idField: 'my-id', app: api }),
+)
 const customIdStore = useCustomIds(pinia)
 
 const reset = () => {

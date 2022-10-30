@@ -1,17 +1,22 @@
 import type { Params } from './types'
-import type { ServiceStoreDefault, GetFn, GetClassParamsStandalone, GetClassParams } from './service-store/types'
+import type { GetFn, GetClassParamsStandalone, GetClassParams, ModelConstructor } from './service/types'
 import type { MaybeRef } from './utility-types'
 import type { Id } from '@feathersjs/feathers'
 import { computed, ComputedRef, isReadonly, isRef, Ref, ref, unref, watch } from 'vue-demi'
-import { BaseModel } from './service-store/base-model'
 
-type Store<M extends BaseModel> = ServiceStoreDefault<M>
+type Store<
+  C extends ModelConstructor = ModelConstructor,
+  M extends InstanceType<C> = InstanceType<C>,
+> = ServiceStoreDefault<C, M>
 
-export function useGet<M extends BaseModel>(id: Id, params: MaybeRef<GetClassParamsStandalone<M>>) {
-  return new Get(id, params)
+export function useGet<C extends ModelConstructor = ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(
+  id: Id,
+  params: MaybeRef<GetClassParamsStandalone<C, M>>,
+) {
+  return new Get<C, M>(id, params)
 }
 
-export class Get<M extends BaseModel> {
+export class Get<C extends ModelConstructor = ModelConstructor, M extends InstanceType<C> = InstanceType<C>> {
   id: Ref<Id | null>
   params: Ref<GetClassParams>
   isSsr: ComputedRef<boolean>
@@ -22,7 +27,7 @@ export class Get<M extends BaseModel> {
   getFromStore: (id: Id | null, params: Params) => M | undefined
 
   // Requests & Watching
-  get: GetFn<M>
+  get: GetFn<C, M>
   request: Ref<Promise<M | undefined>>
   requestCount: Ref<number>
   queryWhen: (queryWhenFn: () => boolean) => void
@@ -34,8 +39,8 @@ export class Get<M extends BaseModel> {
   error: ComputedRef<any>
   clearError: () => void
 
-  constructor(_id: MaybeRef<Id | null>, _params: MaybeRef<GetClassParamsStandalone<M>>) {
-    const store = unref(_params).store as Store<M>
+  constructor(_id: MaybeRef<Id | null>, _params: MaybeRef<GetClassParamsStandalone<C, M>>) {
+    const store = unref(_params).store as Store<C, M>
     const id = isRef(_id) ? (isReadonly(_id) ? ref(_id.value) : _id) : ref(_id)
     const params = isRef(_params) ? (isReadonly(_params) ? ref(_params.value) : _params) : ref(_params)
 

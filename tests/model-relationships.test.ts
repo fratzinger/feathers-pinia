@@ -1,15 +1,15 @@
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
+import { BaseModel, useService, defineServiceStore } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
 class Message extends BaseModel {
   text!: string
 }
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messagesService = useMessagesService(pinia)
 
 class User extends BaseModel {
@@ -37,7 +37,7 @@ class User extends BaseModel {
     })
   }
 }
-const useUsersService = defineStore({ servicePath: 'users', Model: User })
+const useUsersService = defineServiceStore('users', () => useService({ servicePath: 'users', Model: User, app: api }))
 const usersService = useUsersService(pinia)
 
 let amogh: any

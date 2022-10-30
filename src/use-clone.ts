@@ -1,6 +1,6 @@
 import { computed, reactive, ref, toRefs, watchEffect } from 'vue-demi'
-import { BaseModel } from './service-store'
-import { UseCloneOptions } from './service-store/types'
+import { BaseModel } from './service'
+import { UseCloneOptions } from './service/types'
 import { AnyRef } from './types'
 
 export function useClone<M extends BaseModel>(
@@ -20,7 +20,7 @@ export function useClone<M extends BaseModel>(
     // Assure that instance is in the store.
     const instance = val as M
     const anyId = instance.getAnyId()
-    const inStore = instance.Model.getFromStore(anyId)
+    const inStore = instance.getStore().getFromStore(anyId)
     if (!inStore) instance.addToStore()
 
     if (instance) return instance?.clone(undefined, { useExisting }) as M

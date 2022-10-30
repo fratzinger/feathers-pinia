@@ -1,4 +1,4 @@
-import { setupFeathersPinia, BaseModel } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, useService, defineServiceStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 import { resetStores, timeout } from './test-utils'
@@ -6,7 +6,6 @@ import { Find, useFind } from '../src/use-find'
 import { computed, ref } from 'vue-demi'
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
 export class Message extends BaseModel {
   id: number
@@ -18,7 +17,9 @@ export class Message extends BaseModel {
   }
 }
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messageStore = useMessagesService(pinia)
 
 const reset = () => {

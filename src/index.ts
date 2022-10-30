@@ -1,13 +1,8 @@
-export { setupFeathersPinia } from './setup'
-export { defineStore } from './service-store/define-store'
-export { defineAuthStore } from './define-auth-store'
-export { makeServiceStore, BaseModel } from './service-store/index'
 export { associateFind } from './associate-find'
 export { associateGet } from './associate-get'
-export { makeState } from './service-store/make-state'
 
-export { models } from './models'
-export { clients, registerClient } from './clients'
+// export { models } from './models'
+// export { clients, registerClient } from './clients'
 export { OhMyFetch } from './feathers-ohmyfetch'
 
 export { Find, useFind } from './use-find'
@@ -21,5 +16,7 @@ export { useClone } from './use-clone'
 export { syncWithStorage } from './storage-sync'
 export { clearStorage } from './clear-storage'
 
+export { useAuth } from './use-auth'
+
 export * from './types'
-export * from './service-store/types'
+export * from './service'

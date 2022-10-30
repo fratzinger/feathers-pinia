@@ -1,15 +1,15 @@
 import { computed } from 'vue-demi'
 import { createPinia } from 'pinia'
-import { setupFeathersPinia } from '../src/index'
 import { api } from './feathers'
 import { resetStores } from './test-utils'
+import { BaseModel, useService, defineServiceStore } from '../src'
 
 const pinia = createPinia()
 
-const { defineStore, BaseModel } = setupFeathersPinia({ clients: { api } })
-
 class Message extends BaseModel {}
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messagesService = useMessagesService(pinia)
 
 const reset = () => resetStores(api.service('messages'), messagesService)
@@ -35,7 +35,7 @@ describe('Hydration', () => {
     expect(message3.value instanceof Message).toBe(false)
     expect(message4.value instanceof Message).toBe(false)
 
-    Message.findInStore({ query: { id: { $lte: 3 } } })
+    messagesService.findInStore({ query: { id: { $lte: 3 } } })
 
     expect(message0.value instanceof Message).toBe(true)
     expect(message3.value instanceof Message).toBe(true)
@@ -50,7 +50,7 @@ describe('Hydration', () => {
     expect(message0.value instanceof Message).toBe(false)
     expect(message1.value instanceof Message).toBe(false)
 
-    Message.getFromStore(0)
+    messagesService.getFromStore(0)
 
     expect(message0.value instanceof Message).toBe(true)
     // other items were not hydrated.

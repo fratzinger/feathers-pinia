@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { setupFeathersPinia, BaseModel } from '../src/index' // from 'feathers-pinia'
+import { BaseModel, useService, defineServiceStore } from '../src/index' // from 'feathers-pinia'
 import { createPinia } from 'pinia'
 import { api } from './feathers'
 
 const pinia = createPinia()
-const { defineStore } = setupFeathersPinia({ clients: { api } })
 
 export class User extends BaseModel {
   _id: number
@@ -35,7 +34,8 @@ export class Message extends BaseModel {
     this.init(data)
 
     // access to `store` and `models`
-    const { store, models } = this.Model
+    const { models } = this.getModel()
+    const store = this.getStore()
 
     this.user2 = { name: 'Marshall' }
   }
@@ -47,7 +47,9 @@ export class Message extends BaseModel {
   }
 }
 
-const useMessagesService = defineStore({ servicePath: 'messages', Model: Message })
+const useMessagesService = defineServiceStore('messages', () =>
+  useService({ servicePath: 'messages', Model: Message, app: api }),
+)
 const messagesService = useMessagesService(pinia)
 
 describe('Model Classes Using TypeScript', () => {
